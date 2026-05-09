@@ -148,10 +148,9 @@ const CreateResearchMonitoringForm = () => {
       },
       peerjournal: {
         name: "",
-        journal_name: "",
         article_title: "",
-        article_reviewed: undefined,
-        abstract_reviewed: undefined,
+        article_reviewed: "",
+        abstract_reviewed: "",
         coverage: "",
         date_reviewed: "",
         organization: "",

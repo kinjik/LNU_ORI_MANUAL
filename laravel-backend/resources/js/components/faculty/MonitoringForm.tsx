@@ -29,7 +29,7 @@ const filters: Filters = {
   status: "",
 };
 
-const status = ["pending", "approved", "evaluated", "rejected"];
+const status = ["pending", "approved", "evaluated", "rejected", "resubmission"];
 
 const MonitoringForm = () => {
   const { data, isLoading: loading } = useFacultyMonitoringForm();

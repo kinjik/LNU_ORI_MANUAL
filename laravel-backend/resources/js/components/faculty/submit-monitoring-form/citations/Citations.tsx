@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import {
   Control,
   FieldErrors,
@@ -9,16 +10,15 @@ import {
   UseFormSetValue,
   useWatch,
 } from "react-hook-form";
-import { FormData } from "../CreateResearchMonitoringForm";
-import { CiCircleQuestion } from "react-icons/ci";
-import Tooltip from "../../../shared/components/Tooltip";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { useMutation } from "@tanstack/react-query";
+import { BiLinkExternal, BiSearch } from "react-icons/bi";
+import { CiCircleQuestion } from "react-icons/ci";
+import { useAuthContextProvider } from "../../../../hooks/hooks"; // <-- IMPORTED AUTH HOOK
 import api from "../../../api/axios";
 import Button from "../../../shared/components/Button";
+import Tooltip from "../../../shared/components/Tooltip";
 import authorsArray from "../../../util/parseAuthors";
-import { BiSearch, BiLinkExternal } from "react-icons/bi"; // Ensure BiLinkExternal is imported
-import useCrossrefApi from "../crossref/useCrossrefApi";
+import { FormData } from "../CreateResearchMonitoringForm";
 import { useCitationsPoints } from "../points/usePoints";
 
 type ResearchType = { type: string; id: number };
@@ -57,6 +57,8 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
   });
 
   const [citedIsScopus, setCitedIsScopus] = useState<boolean | null>(null);
+  
+  const { user } = useAuthContextProvider(); // <-- GRAB THE USER HERE
 
   const citedResearch = useWatch({
     name: "citations.cited_article_title",
@@ -67,8 +69,6 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
   const authors = useWatch({ name: "citations.authors", control });
   const url = useWatch({ name: "citations.url_link", control });
   const scopusLink = useWatch({ name: "citations.scopus_link", control });
-
-  const { data: response, isLoading } = useCrossrefApi(title, authors);
 
   const { points: citationsPoints, totalPoints } = useCitationsPoints(
     citedIsScopus,
@@ -101,20 +101,16 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
     },
   });
 
+  // Automatically set the author to the logged-in user when the component loads
+  useEffect(() => {
+    if (user) {
+      setValue("citations.authors", `${user.fname} ${user.lname}`, { shouldValidate: true });
+    }
+  }, [user, setValue]);
+
   useEffect(() => {
     points.onChange(citationsPoints);
   }, [citationsPoints, points]);
-
-  useEffect(() => {
-    if (!response) return;
-
-    setValue("citations.url_link", response.article_link);
-    setValue("citations.date", response.date);
-    setValue("citations.publisher_name", response.editor_publisher);
-    setValue("citations.journal_title", response.journal_name);
-    setValue("citations.issno_vol_pages", response.issno_vol_pages);
-    setValue("citations.date", response.date);
-  }, [response, setValue]);
 
   return (
     <>
@@ -122,12 +118,6 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
         Published Research Details
       </h1>
 
-      {isLoading && (
-        <div className="my-5 flex items-center justify-start gap-x-2">
-          <AiOutlineLoading3Quarters className="size-8 animate-spin" />
-          <p>Fetching your published research online</p>
-        </div>
-      )}
       <hr className="my-2 w-full border-2 border-gray-700" />
 
       <div className="mt-10 grid w-full grid-cols-2 gap-5">
@@ -151,6 +141,7 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
             {errors.citations?.research_title?.message}
           </p>
         </div>
+        
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -160,7 +151,7 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
           </label>
           <input
             id="authors"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize"
+            className="h-9 rounded-md border border-gray-800 p-1 capitalize bg-gray-50"
             {...register("citations.authors", {
               required: "This field is required",
             })}
@@ -169,6 +160,7 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
             {errors.citations?.authors?.message}
           </p>
         </div>
+        
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -215,7 +207,7 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
           <input
             id="issno"
             className="h-9 rounded-md border border-gray-800 p-1"
-            type="url"
+            type="text"
             {...register("citations.issno_vol_pages", {
               required: "This field is required",
             })}
@@ -246,7 +238,6 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
           </p>
         </div>
 
-        {/* --- FIXED: Separated Input and Link Button --- */}
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -257,7 +248,7 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
           <div className="flex items-center gap-2">
             <input
               id="articleLink"
-              className="h-9 flex-1 rounded-md border border-gray-800 p-1"
+              className="h-9 flex-1 rounded-md border border-gray-800 p-1 text-ellipsis overflow-hidden whitespace-nowrap"
               type="url"
               {...register("citations.url_link", {
                 required: "This field is required",
@@ -279,7 +270,6 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
             {errors.citations?.url_link?.message}
           </p>
         </div>
-        {/* ---------------------------------------------- */}
 
         <div className="col-span-2">
           <h1 className="mb-4 text-2xl font-bold text-gray-800">
@@ -355,7 +345,6 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
           )}
         </div>
         
-        {/* --- FIXED: Separated Input and Link Button for Scopus --- */}
         {citedIsScopus && (
           <div className="flex flex-col gap-2">
             <label className="font-semibold" htmlFor="scopusLink">
@@ -364,7 +353,7 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
             <div className="flex items-center gap-2">
               <input
                 id="scopusLink"
-                className="h-9 flex-1 rounded-md border border-gray-800 p-1"
+                className="h-9 flex-1 rounded-md border border-gray-800 p-1 text-ellipsis overflow-hidden whitespace-nowrap"
                 type="url"
                 {...register("citations.scopus_link")}
               />
@@ -385,7 +374,6 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
             </p>
           </div>
         )}
-        {/* -------------------------------------------------------- */}
 
         <div className="flex flex-col gap-2">
           <label

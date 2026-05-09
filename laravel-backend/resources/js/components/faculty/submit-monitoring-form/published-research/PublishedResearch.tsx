@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Control,
   FieldErrors,
@@ -11,15 +11,14 @@ import {
 } from "react-hook-form";
 import { FormData } from "../CreateResearchMonitoringForm";
 
-import { CiCircleQuestion } from "react-icons/ci";
-import Tooltip from "../../../shared/components/Tooltip";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import Button from "../../../shared/components/Button";
-import { MdArrowDropDown, MdCheckCircle, MdSync } from "react-icons/md";
 import { useMutation } from "@tanstack/react-query";
+import { CiCircleQuestion } from "react-icons/ci";
+import { MdArrowDropDown, MdCheckCircle, MdSync } from "react-icons/md";
+import { useAuthContextProvider } from "../../../../hooks/hooks"; // <-- IMPORTED YOUR AUTH HOOK
 import api from "../../../api/axios";
+import Button from "../../../shared/components/Button";
+import Tooltip from "../../../shared/components/Tooltip";
 import { coverages, indexes } from "../constants/constant";
-import useCrossrefApi from "../crossref/useCrossrefApi";
 import { usePublishedResearchPoints } from "../points/usePoints";
 
 type ResearchType = { type: string; id: number };
@@ -65,6 +64,7 @@ const PublishedResearch = ({
   });
 
   const [selectOpen, setSelectOpen] = useState(false);
+  const { user } = useAuthContextProvider(); // <-- GRAB THE USER HERE
 
   const journalName = useWatch({ name: "published.journal_name", control });
   const coverage = useWatch({ name: "published.coverage", control });
@@ -72,8 +72,6 @@ const PublishedResearch = ({
   const title = useWatch({ name: "published.title", control });
   const scopusLink = useWatch({ name: "published.scopus_link", control });
   const selectedIndex = useWatch({ name: "published.indexing", control });
-
-  const { data: response, isLoading } = useCrossrefApi(title, authors);
 
   const { points: publishedPoints, total } = usePublishedResearchPoints(
     coverage,
@@ -104,20 +102,16 @@ const PublishedResearch = ({
     },
   });
 
+  // Automatically set the author to the logged-in user when the component loads
+  useEffect(() => {
+    if (user) {
+      setValue("published.authors", `${user.fname} ${user.lname}`, { shouldValidate: true });
+    }
+  }, [user, setValue]);
+
   useEffect(() => {
     points.onChange(publishedPoints);
   }, [publishedPoints, points]);
-
-  useEffect(() => {
-    if (!response) return;
-
-    setValue("published.article_link", response.article_link);
-    setValue("published.date", response.date);
-    setValue("published.editor_publisher", response.editor_publisher);
-    setValue("published.journal_name", response.journal_name);
-    setValue("published.issno_vol_pages", response.issno_vol_pages);
-    setValue("published.num_citations_date", response.num_citations_date);
-  }, [response, setValue]);
 
   const handleCheckboxChange = (value: string) => {
     let newValues = selectedIndex ? selectedIndex.split(", ") : [];
@@ -138,14 +132,6 @@ const PublishedResearch = ({
       });
     }
 
-    // if(errors.published?.indexing?.message) {
-
-    //   const indexes = selectedIndex.value.replace(", Scopus", "");
-
-    //   selectedIndex.onChange(indexes);
-
-    // }
-
     if (!newValues.includes("Scopus")) {
       clearError("published.indexing");
     }
@@ -157,12 +143,6 @@ const PublishedResearch = ({
         Published Research Details
       </h1>
 
-      {isLoading && (
-        <div className="my-5 flex items-center justify-start gap-x-2">
-          <AiOutlineLoading3Quarters className="size-8 animate-spin" />
-          <p>Fetching your published research online</p>
-        </div>
-      )}
       <hr className="my-2 w-full border-2 border-gray-700" />
 
       <div className="mt-10 grid w-full grid-cols-2 gap-5">
@@ -186,6 +166,7 @@ const PublishedResearch = ({
             {errors.published?.title?.message}
           </p>
         </div>
+        
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -195,7 +176,7 @@ const PublishedResearch = ({
           </label>
           <input
             id="authors"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize"
+            className="h-9 rounded-md border border-gray-800 p-1 capitalize bg-gray-50"
             {...register("published.authors", {
               required: "This field is required",
             })}
@@ -204,6 +185,28 @@ const PublishedResearch = ({
             {errors.published?.authors?.message}
           </p>
         </div>
+
+        {/* MISSING DATE FIELD ADDED HERE */}
+        <div className="flex flex-col gap-2">
+          <label
+            className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
+            htmlFor="datePublished"
+          >
+            Date Published
+          </label>
+          <input
+            id="datePublished"
+            type="date"
+            className="h-9 rounded-md border border-gray-800 p-1"
+            {...register("published.date", {
+              required: "This field is required",
+            })}
+          />
+          <p className="my-1.5 text-red-500">
+            {errors.published?.date?.message}
+          </p>
+        </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -410,7 +413,7 @@ const PublishedResearch = ({
           </label>
           <input
             id="articleLink"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize"
+            className="h-9 rounded-md border border-gray-800 p-1"
             type="url"
             {...register("published.article_link", {
               required: "This field is required",
@@ -429,7 +432,7 @@ const PublishedResearch = ({
           </label>
           <input
             id="issno"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize"
+            className="h-9 rounded-md border border-gray-800 p-1"
             type="url"
             {...register("published.issno_vol_pages", {
               required: "This field is required",

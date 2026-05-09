@@ -1,14 +1,16 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Control,
   FieldErrors,
   useController,
   UseFormRegister,
+  UseFormSetValue,
   useWatch,
 } from "react-hook-form";
 import { FormData } from "../CreateResearchMonitoringForm";
 
 import { CiCircleQuestion } from "react-icons/ci";
+import { useAuthContextProvider } from "../../../../hooks/hooks";
 import Tooltip from "../../../shared/components/Tooltip";
 import { COVERAGES } from "../../../shared/types/types";
 import { useGetPresentedPoints } from "../points/usePoints";
@@ -28,19 +30,21 @@ type PresentedResearchProps = {
   errors: FieldErrors<FormData>;
   researchDetails: DataType | undefined;
   control: Control<FormData>;
+  setValue: UseFormSetValue<FormData>;
 };
 
 const PresentedResearch = ({
   register,
   errors,
   control,
+  setValue,
 }: PresentedResearchProps) => {
   const { field: points } = useController({
     name: "presented.points",
     control,
   });
   const coverage = useWatch({ name: "presented.conference_type", control });
-
+  const { user } = useAuthContextProvider();
   const { points: presentedPoints } = useGetPresentedPoints(
     coverage.toLowerCase(),
     "presenter",
@@ -49,6 +53,12 @@ const PresentedResearch = ({
   useEffect(() => {
     points.onChange(presentedPoints);
   }, [presentedPoints, points]);
+  useEffect(() => {
+    if (user) {
+      setValue("presented.presenter_name", `${user.fname} ${user.lname}`);
+    }
+  }, [user, setValue]);
+
 
   return (
     <>
@@ -59,6 +69,26 @@ const PresentedResearch = ({
       <hr className="my-2 w-full border-2 border-gray-700" />
 
       <div className="mt-10 grid w-full grid-cols-2 gap-5">
+        <div className="flex flex-col gap-2">
+          <label
+            className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
+            htmlFor="presenterName"
+          >
+            Presenter Name
+          </label>
+          <input
+            id="presenterName"
+            className="h-9 rounded-md border border-gray-800 p-1 capitalize bg-gray-50"
+            {...register("presented.presenter_name", {
+              required: "Presenter name is required",
+            })}
+          />
+          <p className="my-1.5 text-red-500">
+            {errors.presented?.presenter_name?.message}
+          </p>
+        </div>
+
+        
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"

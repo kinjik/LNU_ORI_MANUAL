@@ -27,6 +27,11 @@ const Badge = ({ title, color, type }: BadgePropsType) => {
           evaluated
         </span>
       )}
+      {type === "resubmission" && (
+        <span className="me-2 rounded-md bg-orange-200 px-2.5 py-1 text-sm font-semibold text-orange-800">
+          resubmission
+        </span>
+      )}
       {!type && (
         <span
           className={`bg-${color}-200 text-${color}-800 me-2 rounded-md px-2.5 py-1 text-sm font-semibold`}

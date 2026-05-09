@@ -34,7 +34,7 @@ const filters: Filters = {
 
 const colleges = ["CAS", "CME", "COE"];
 
-const status = ["pending", "approved", "evaluated", "rejected"];
+const status = ["pending", "approved", "evaluated", "rejected", "resubmission"];
 
 export default function ResearchSubmissions() {
   const { data: researchInvolvementTypes } = useGetResearchInvolvementTypes();

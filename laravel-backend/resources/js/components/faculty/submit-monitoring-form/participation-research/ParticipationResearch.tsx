@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Control,
   FieldErrors,
@@ -86,6 +86,7 @@ const ParticipationResearch = ({
             {errors.participation?.research_title?.message}
           </p>
         </div>
+        
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -93,17 +94,42 @@ const ParticipationResearch = ({
           >
             Nature of Attendance
           </label>
-          <input
+          <select
             id="attendanceNature"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize"
+            className="h-9 cursor-pointer rounded-md border border-gray-800 p-1 capitalize"
             {...register("participation.attendance_nature", {
               required: "Attendance nature is required",
             })}
-          />
+          >
+            <option value="" disabled selected>Select Nature of Attendance</option>
+            
+            <option value="attendance">Attendance / Participant</option>
+            
+            <option value="organizer">Organizer</option>
+            <option value="coordinator">Coordinator</option>
+            <option value="facilitator">Facilitator</option>
+            <option value="moderator">Moderator</option>
+            <option value="committee member">Committee Member</option>
+            
+            <option value="speaker">Speaker</option>
+            <option value="presenter">Presenter</option>
+            <option value="lecturer">Lecturer</option>
+            <option value="resource person">Resource Person</option>
+            
+            <option value="editor in chief">Editor in Chief</option>
+            <option value="associate editor">Associate Editor</option>
+            <option value="managing editor">Managing Editor</option>
+            <option value="production and circulation manager">Production & Circulation Manager</option>
+            
+            <option value="judge">Judge</option>
+            <option value="business manager">Business Manager</option>
+            <option value="consultant">Consultant</option>
+          </select>
           <p className="my-1.5 text-red-500">
             {errors.participation?.attendance_nature?.message}
           </p>
         </div>
+        
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -122,6 +148,7 @@ const ParticipationResearch = ({
             {errors.participation?.organizer?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -131,15 +158,18 @@ const ParticipationResearch = ({
           </label>
           <input
             id="datePresented"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize"
+            type="date"
+            className="h-9 rounded-md border border-gray-800 p-1"
             {...register("participation.date", {
               required: "Date is required",
+              valueAsDate: true,
             })}
           />
           <p className="my-1.5 text-red-500">
             {errors.participation?.date?.message}
           </p>
         </div>
+        
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -158,6 +188,7 @@ const ParticipationResearch = ({
             {errors.participation?.place?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -170,23 +201,18 @@ const ParticipationResearch = ({
             className="h-9 cursor-pointer rounded-md border border-gray-800 p-1 capitalize"
             {...register("participation.coverage", { required: true })}
           >
+            <option value="" disabled selected>Select Coverage</option>
             {Object.values(COVERAGES).map((coverage) => (
               <option key={coverage} value={coverage}>
                 {coverage}
               </option>
             ))}
           </select>
-          {/* <input
-            id="conferenceType"
-            className="h-9 rounded-md border border-gray-800 p-1"
-            {...register("participation.coverage", {
-              required: "Conference place is required",
-            })}
-          /> */}
           <p className="my-1.5 text-red-500">
             {errors.participation?.coverage?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -199,18 +225,17 @@ const ParticipationResearch = ({
             className="h-9 cursor-pointer rounded-md border border-gray-800 p-1 capitalize"
             {...register("participation.conference_type", { required: true })}
           >
+            <option value="" disabled selected>Select Type</option>
             <option value="managerial">Managerial</option>
-
             <option value="supervisory">Supervisory</option>
-
             <option value="technical">Technical</option>
-
             <option value="research conference">Research Conference</option>
           </select>
           <p className="my-1.5 text-red-500">
             {errors.participation?.conference_type?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -225,14 +250,13 @@ const ParticipationResearch = ({
               required: true,
             })}
           >
+            <option value="" disabled selected>Select Fund Source</option>
             <option value={FundSourceNatureEnum.EXTERNALLY_FUNDED}>
               {FundSourceNatureEnum.EXTERNALLY_FUNDED}
             </option>
-
             <option value={FundSourceNatureEnum.LNU_FUNDED_INITIATED}>
               {FundSourceNatureEnum.LNU_FUNDED_INITIATED}
             </option>
-
             <option value={FundSourceNatureEnum.PERSONAL}>
               {FundSourceNatureEnum.PERSONAL}
             </option>
@@ -241,6 +265,7 @@ const ParticipationResearch = ({
             {errors.participation?.fund_source_nature?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="w-full font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -255,8 +280,9 @@ const ParticipationResearch = ({
             >
               {points.value}
             </div>
+            {/* --- FIXED: Added optional chaining to prevent undefined crashes --- */}
             <Tooltip
-              text={`As a ${category.toLowerCase()} to an ${coverage.toLowerCase()} research/seminar/activity, the following is given ${participationPoints} points.`}
+              text={`As a ${category?.toLowerCase() || 'participant'} to an ${coverage?.toLowerCase() || 'selected'} research/seminar/activity, the following is given ${participationPoints || 0} points.`}
             >
               <CiCircleQuestion className="h-5 w-5" />
             </Tooltip>

@@ -48,6 +48,7 @@ class ParticipationToResearchController extends Controller
             break;
             case "per day":
             $totalPoints = $duration * $points->points;
+            break;
             case "per project":
             case "per presentation":
 

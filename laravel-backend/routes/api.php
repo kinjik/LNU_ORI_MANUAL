@@ -198,6 +198,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/admin/research-monitoring-form/{form}/update', [ResearchMonitoringFormController::class, 'updateAdmin'])->middleware('permission:research-monitoring-form-update-status');
 
     Route::delete("/research-monitoring-form/{researchMonitoringForm}", [ResearchMonitoringFormController::class, 'destroy'])->middleware(['can:delete,researchMonitoringForm']);
+    Route::post('/research-monitoring-form/{researchMonitoringForm}/add-document', [ResearchMonitoringFormController::class, 'addDocument'])->middleware(['can:update,researchMonitoringForm']);
+
 
     //research involvement type
 

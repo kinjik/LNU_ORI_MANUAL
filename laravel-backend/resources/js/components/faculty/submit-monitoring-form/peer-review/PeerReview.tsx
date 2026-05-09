@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Control,
   FieldErrors,
@@ -11,7 +11,6 @@ import { FormData } from "../CreateResearchMonitoringForm";
 import { CiCircleQuestion } from "react-icons/ci";
 import Tooltip from "../../../shared/components/Tooltip";
 import { useGetPeerReviewPoints } from "../points/usePoints";
-import { COVERAGES } from "../../../shared/types/types";
 
 type PeerReviewProps = {
   register: UseFormRegister<FormData>;
@@ -29,10 +28,12 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
   const article = useWatch({ name: "peerjournal.article_reviewed", control });
   const abstract = useWatch({ name: "peerjournal.abstract_reviewed", control });
 
+  // Math Hook: We wrap article and abstract in Number() so the math works, 
+  // even though the form sends them as strings to satisfy Laravel!
   const { points: totalPoints } = useGetPeerReviewPoints(
-    coverage,
-    article,
-    abstract,
+    coverage?.toLowerCase(),
+    Number(article) || 0,
+    Number(abstract) || 0,
   );
 
   useEffect(() => {
@@ -51,30 +52,31 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
-            htmlFor="type"
+            htmlFor="journalName"
           >
             Journal Name
           </label>
           <input
-            id="type"
+            id="journalName"
             className="h-9 rounded-md border border-gray-800 p-1"
-            {...register("peerjournal.journal_name", {
+            {...register("peerjournal.name", {
               required: "This field is required",
             })}
           />
           <p className="my-1.5 text-red-500">
-            {errors.peerjournal?.journal_name?.message}
+            {errors.peerjournal?.name?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
-            htmlFor="title"
+            htmlFor="articleTitle"
           >
             Article Title Reviewed
           </label>
           <input
-            id="title"
+            id="articleTitle"
             className="h-9 rounded-md border border-gray-800 p-1"
             {...register("peerjournal.article_title")}
           />
@@ -82,15 +84,18 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
             {errors.peerjournal?.article_title?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
-            htmlFor="documentId"
+            htmlFor="articleReviewed"
           >
-            Number of Article Reviewed
+            Number of Articles Reviewed
           </label>
           <input
-            id="documentId"
+            id="articleReviewed"
+            type="number"
+            min="0"
             className="h-9 rounded-md border border-gray-800 p-1"
             {...register("peerjournal.article_reviewed")}
           />
@@ -98,16 +103,16 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
             {errors.peerjournal?.article_reviewed?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
-            htmlFor="registration"
+            htmlFor="abstractTitle"
           >
             Abstract Title Reviewed
           </label>
           <input
-            id="registration"
-            type="date"
+            id="abstractTitle"
             className="h-9 rounded-md border border-gray-800 p-1"
             {...register("peerjournal.abstract_title")}
           />
@@ -115,15 +120,18 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
             {errors.peerjournal?.abstract_title?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
             htmlFor="abstractNumber"
           >
-            Number of Abstract Reviewed
+            Number of Abstracts Reviewed
           </label>
           <input
             id="abstractNumber"
+            type="number"
+            min="0"
             className="h-9 rounded-md border border-gray-800 p-1"
             {...register("peerjournal.abstract_reviewed")}
           />
@@ -131,15 +139,16 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
             {errors.peerjournal?.abstract_reviewed?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
-            htmlFor="publication"
+            htmlFor="dateReviewed"
           >
             Date Reviewed
           </label>
           <input
-            id="publication"
+            id="dateReviewed"
             type="date"
             className="h-9 rounded-md border border-gray-800 p-1"
             {...register("peerjournal.date_reviewed", {
@@ -150,6 +159,7 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
             {errors.peerjournal?.date_reviewed?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -164,16 +174,18 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
               required: "This field is required",
             })}
           >
-            {Object.values(COVERAGES).map((coverage) => (
-              <option key={coverage} value={coverage}>
-                {coverage}
-              </option>
-            ))}
+            <option value="" disabled selected>Select Coverage</option>
+            {/* FIX: Updated to strictly match the 4 values in your Tinker output! */}
+            <option value="lnu">LNU</option>
+            <option value="local">Local</option>
+            <option value="international">International</option>
+            <option value="isi">ISI</option>
           </select>
           <p className="my-1.5 text-red-500">
             {errors.peerjournal?.coverage?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -188,11 +200,11 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
               required: "This field is required",
             })}
           />
-
           <p className="my-1.5 text-red-500">
-            {errors.intellectual?.processor_name?.message}
+            {errors.peerjournal?.organization?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="w-full font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -208,7 +220,7 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
               {points.value}
             </div>
             <Tooltip
-              text={`Total points earned for ${coverage} is ${totalPoints} points multiply the number of article ${article} or abstract ${abstract}. Your points is ${points} points.`}
+              text={`Total base points for ${coverage || "this coverage"} is ${totalPoints}. Your total calculated points is ${points.value || 0}.`}
             >
               <CiCircleQuestion className="h-5 w-5" />
             </Tooltip>

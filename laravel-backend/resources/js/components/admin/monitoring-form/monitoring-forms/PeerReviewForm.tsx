@@ -72,7 +72,7 @@ const PeerReviewForm = ({
         </label>
         <input
           id="Activity/Seminar/Research Title"
-          value={peerreview.journal_name}
+          value={peerreview.name}
           disabled
           className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
         />

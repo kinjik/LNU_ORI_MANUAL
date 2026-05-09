@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Control,
   FieldErrors,
@@ -27,7 +27,9 @@ const IntellectualProperty = ({
     name: "intellectual.points",
     control,
   });
+
   const type = useWatch({ name: "intellectual.property_type", control });
+  
   const acceptanceDate = useWatch({
     name: "intellectual.acceptance_date",
     control,
@@ -37,19 +39,25 @@ const IntellectualProperty = ({
     name: "intellectual.publication_date",
     control,
   });
-  const isLNU = useWatch({ name: "intellectual.processor_name", control });
+  const processorName = useWatch({ name: "intellectual.processor_name", control });
+
+  // Safe check that won't crash if empty
+  const safeProcessorName = String(processorName || "").toLowerCase();
+  const isLNUProcessed =
+    safeProcessorName.includes("leyte normal university") ||
+    safeProcessorName.includes("lnu");
 
   const { allPoints: total, points: intellectualPoints } =
     useGetIntellectualPropertyPoints({
-      type: type,
+      type: String(type || ""),
       acceptance_date: acceptanceDate,
       grant_date: grantDate,
       publication_date: publicationDate,
-      isLNU: isLNU.toLowerCase().includes("leyte normal university"),
+      isLNU: isLNUProcessed,
     });
 
   const getPointsMessage = (
-    type: string | undefined,
+    type: string,
     allPoints: {
       inclusion: string;
       points: number;
@@ -58,16 +66,16 @@ const IntellectualProperty = ({
   ): string => {
     switch (type) {
       case "copyright":
-        return `You earn ${allPoints.find((item) => item.inclusion === "copyright")?.points} points if Leyte Normal University processed your certificate of copyright registration. 0 points if not.`;
+        return `You earn ${allPoints.find((item) => item.inclusion === "copyright")?.points || 0} points if Leyte Normal University processed your certificate of copyright registration. 0 points if not.`;
       case "industrial design":
       case "trademark":
-        return `You earn ${allPoints.find((item) => item.inclusion === "trademark" || item.inclusion === "industrial design")?.points} points for trademark or industrial design.`;
+        return `You earn ${allPoints.find((item) => item.inclusion === "trademark" || item.inclusion === "industrial design")?.points || 0} points for trademark or industrial design.`;
       case "utility model":
-        return `You earn ${allPoints.find((item) => item.inclusion === "utility model" && item.status === "accepted")?.points} points if accepted, ${allPoints.find((item) => item.inclusion === "utility model" && item.status === "published")?.points} if published, ${allPoints.find((item) => item.inclusion === "utility model" && item.status === "granted")?.points} if granted.`;
+        return `You earn ${allPoints.find((item) => item.inclusion === "utility model" && item.status === "accepted")?.points || 0} points if accepted, ${allPoints.find((item) => item.inclusion === "utility model" && item.status === "published")?.points || 0} if published, ${allPoints.find((item) => item.inclusion === "utility model" && item.status === "granted")?.points || 0} if granted.`;
       case "patent/invention":
-        return `You earn ${allPoints.find((item) => item.inclusion === "patent/invention" && item.status === "accepted")?.points} points if accepted, ${allPoints.find((item) => item.inclusion === "patent/invention" && item.status === "published")?.points} if published, ${allPoints.find((item) => item.inclusion === "patent/invention" && item.status === "granted")?.points} if granted.`;
+        return `You earn ${allPoints.find((item) => item.inclusion === "patent/invention" && item.status === "accepted")?.points || 0} points if accepted, ${allPoints.find((item) => item.inclusion === "patent/invention" && item.status === "published")?.points || 0} if published, ${allPoints.find((item) => item.inclusion === "patent/invention" && item.status === "granted")?.points || 0} if granted.`;
       default:
-        return "";
+        return "Select an Intellectual Property Type to view point calculations.";
     }
   };
 
@@ -75,16 +83,6 @@ const IntellectualProperty = ({
     points.onChange(intellectualPoints);
   }, [intellectualPoints, points]);
 
-  //   type: "",
-  //         title: "",
-  //         owner_name: "",
-  //         processor_name: "",
-  //         document_id: "",
-  //         registration_date: "",
-  //         acceptance_date: "",
-  //         publication_date: "",
-  //         grant_date: "",
-  //         expiry_date: "",
   return (
     <>
       <h1 className="mb-4 text-2xl font-bold text-gray-800">
@@ -101,17 +99,27 @@ const IntellectualProperty = ({
           >
             Intellectual Property Type
           </label>
-          <input
+          <select
             id="type"
-            className="h-9 rounded-md border border-gray-800 p-1"
+            className="h-9 cursor-pointer rounded-md border border-gray-800 p-1 capitalize"
             {...register("intellectual.property_type", {
               required: "This field is required",
             })}
-          />
+          >
+            <option value="" disabled selected>
+              Select Property Type
+            </option>
+            <option value="copyright">Copyright</option>
+            <option value="industrial design">Industrial Design</option>
+            <option value="trademark">Trademark</option>
+            <option value="utility model">Utility Model</option>
+            <option value="patent/invention">Patent / Invention</option>
+          </select>
           <p className="my-1.5 text-red-500">
             {errors.intellectual?.property_type?.message}
           </p>
         </div>
+
         <div className="flex flex-col gap-2">
           <label
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
@@ -122,7 +130,7 @@ const IntellectualProperty = ({
           <input
             id="title"
             className="h-9 rounded-md border border-gray-800 p-1"
-            {...register("intellectual.title", { required: true })}
+            {...register("intellectual.title", { required: "This field is required." })}
           />
           <p className="my-1.5 text-red-500">
             {errors.intellectual?.title?.message}
@@ -139,7 +147,7 @@ const IntellectualProperty = ({
             id="documentId"
             className="h-9 rounded-md border border-gray-800 p-1"
             {...register("intellectual.document_id", {
-              required: true,
+              required: "This field is required.",
             })}
           />
           <p className="my-1.5 text-red-500">
@@ -213,9 +221,8 @@ const IntellectualProperty = ({
           <input
             id="org"
             className="h-9 cursor-pointer rounded-md border border-gray-800 p-1"
-            {...register("intellectual.processor_name", { required: true })}
+            {...register("intellectual.processor_name", { required: "This field is required." })}
           />
-
           <p className="my-1.5 text-red-500">
             {errors.intellectual?.processor_name?.message}
           </p>
@@ -272,7 +279,7 @@ const IntellectualProperty = ({
             >
               {points.value}
             </div>
-            <Tooltip text={getPointsMessage(type.toLowerCase(), total)}>
+            <Tooltip text={getPointsMessage(String(type || "").toLowerCase(), total)}>
               <CiCircleQuestion className="h-5 w-5" />
             </Tooltip>
           </div>

@@ -11,19 +11,15 @@ import PublishedResearchForm from "./components/PublishedResearchForm";
 import CitationsForm from "./components/CitationsForm";
 import OtherResearchForm from "./components/OtherResearchForm";
 
-// --- FIX: Helper to repair broken URLs ---
 const getImageUrl = (path: string | null | undefined) => {
   if (!path) return "https://via.placeholder.com/150";
   
-  // If the backend sends 'http://localhost/storage', change it to port 8000
   if (path.startsWith("http://localhost/storage")) {
       return path.replace("http://localhost/", "http://localhost:8000/");
   }
 
-  // If it's already a full URL, keep it
   if (path.startsWith("http")) return path; 
 
-  // If it's just a filename, add the full prefix
   return `http://localhost:8000/storage/${path}`; 
 };
 const MonitoringForm = () => {
@@ -90,17 +86,13 @@ const MonitoringForm = () => {
 
             <Badge type={data?.status} />
           </div>
-          {data?.rejected_message && (
-            <p className="mx-auto mb-2 mt-5 text-sm text-red-500">
-              {data.rejected_message}
-            </p>
-          )}
           <div className="mx-auto mt-5 w-2/3 flex-col items-center justify-center px-7 pb-10">
             {data?.presentedresearchprod && (
               <PresentedResearchForm
                 presented={data.presentedresearchprod}
                 formStatus={data.status}
                 documents={data.researchdocuments}
+                rejected_message={data.rejected_message ?? null}  
               />
             )}
             {data?.completedresearchprod && (
@@ -108,6 +100,7 @@ const MonitoringForm = () => {
                 completed={data.completedresearchprod}
                 documents={data.researchdocuments}
                 formStatus={data.status}
+                rejected_message={data.rejected_message ?? null}
               />
             )}
             {data?.attendancetoresearch && (
@@ -115,6 +108,7 @@ const MonitoringForm = () => {
                 attendancetoresearch={data.attendancetoresearch}
                 documents={data.researchdocuments}
                 formStatus={data.status}
+                rejected_message={data.rejected_message ?? null}
               />
             )}
             {data?.intellectualproperty && (
@@ -122,6 +116,7 @@ const MonitoringForm = () => {
                 intellectualproperty={data.intellectualproperty}
                 documents={data.researchdocuments}
                 formStatus={data.status}
+                rejected_message={data.rejected_message ?? null}
               />
             )}
             {data?.peerreview && (
@@ -129,6 +124,7 @@ const MonitoringForm = () => {
                 documents={data.researchdocuments}
                 peerreview={data.peerreview}
                 formStatus={data.status}
+                rejected_message={data.rejected_message ?? null}
               />
             )}
 
@@ -137,6 +133,7 @@ const MonitoringForm = () => {
                 documents={data.researchdocuments}
                 formStatus={data.status}
                 published={data.publishedresearchprod}
+                rejected_message={data.rejected_message ?? null}
               />
             )}
 
@@ -144,6 +141,8 @@ const MonitoringForm = () => {
               <CitationsForm
                 formStatus={data.status}
                 citations={data.citations}
+                documents={data.researchdocuments}
+                rejected_message={data.rejected_message ?? null}
               />
             )}
 

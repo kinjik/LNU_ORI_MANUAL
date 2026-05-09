@@ -30,7 +30,7 @@ class IntellectualPropertyStoreRequest extends FormRequest
             'agenda_mappings' => ['required', 'array'],
             'agenda_mappings.*' => ['integer'],
 
-            'intellectual.type' => ['string','required'],
+            'intellectual.property_type' => ['string','required'],
             'intellectual.title' => ['string','required'],
             'intellectual.owner_name' => ['string','required'],
             'intellectual.processor_name' => ['string','required'],
@@ -40,7 +40,7 @@ class IntellectualPropertyStoreRequest extends FormRequest
             'intellectual.acceptance_date' => ['date','nullable'],
             'intellectual.publication_date' => ['date','nullable'],
             'intellectual.grant_date' => ['date','nullable'],
-            'intellectual.points' => ['integer','required'],
+            'intellectual.points' => ['numeric','required'],
 
         ];
     }

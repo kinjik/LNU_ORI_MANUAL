@@ -11,6 +11,8 @@ import PublishedResearchDetails from "./components/ResearchFormDetails/Published
 import PeerReviewForm from "./components/ResearchFormDetails/PeerReviewForm";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
+
+
 const MonitoringFormDetails = () => {
   const { id } = useParams();
 
@@ -80,10 +82,24 @@ const MonitoringFormDetails = () => {
 
           <Badge type={data?.status} />
         </div>
-        {data?.rejected_message && (
-          <p className="mx-auto mb-2 mt-5 text-sm text-red-500">
-            {data.rejected_message}
-          </p>
+                {data?.rejected_message && (
+          <div className={`mb-6 rounded-md border-l-4 p-4 w-full ${data.status === 'resubmission' ? 'border-orange-500 bg-orange-50' : 'border-red-500 bg-red-50'}`}>
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className={`h-5 w-5 ${data.status === 'resubmission' ? 'text-orange-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className={`text-sm font-semibold ${data.status === 'resubmission' ? 'text-orange-800' : 'text-red-800'}`}>
+                  {data.status === 'resubmission' ? 'Coordinator Remarks / Lacking Requirements' : 'Rejection Reason'}
+                </h3>
+                <p className={`mt-2 text-sm ${data.status === 'resubmission' ? 'text-orange-700' : 'text-red-700'}`}>
+                  {data.rejected_message}
+                </p>
+              </div>
+            </div>
+          </div>
         )}
         {data?.attendancetoresearch && (
           <AttendanceToResearch
@@ -108,7 +124,11 @@ const MonitoringFormDetails = () => {
           />
         )}
         {data?.citations && (
-          <CitationsDetails status={data.status} citations={data.citations} />
+          <CitationsDetails 
+            status={data.status}
+            citations={data.citations}
+            documents={data.researchdocuments}
+          />
         )}
         {data?.intellectualproperty && (
           <IntellectualPropertyDetails

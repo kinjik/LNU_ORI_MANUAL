@@ -52,17 +52,21 @@ class ResearchMonitoringFormController extends Controller
                 ->latest();
 
             if ($status !== 'all') {
-                $query->where('status', $status)
-                    ->where(function ($q) use ($search) {
-                        $q->whereRelation('researchinvolvement', 'research_involvement_type', 'LIKE', "%$search%")
-                            ->orWhereRelation('users', function ($query) use ($search) {
-                                $query->where('fname', 'LIKE', "%$search%")
-                                    ->orWhere('lname', 'LIKE', "%$search%")
-                                    ->orWhere('unit', 'LIKE', "%$search%");
-                            });
-                    });
+                $statuses = $status === ResearchMonitoringFormStatus::PENDING->value
+                    ? [ResearchMonitoringFormStatus::PENDING->value, ResearchMonitoringFormStatus::RESUBMISSION->value]
+                    : [$status];
 
-                $monitoringForms = $query->paginate(5);
+                $query->whereIn('status', $statuses)
+                    ->where(function ($q) use ($search) {
+                    $q->whereRelation('researchinvolvement', 'research_involvement_type', 'LIKE', "%$search%")
+                        ->orWhereRelation('users', function ($query) use ($search) {
+                            $query->where('fname', 'LIKE', "%$search%")
+                                ->orWhere('lname', 'LIKE', "%$search%")
+                                ->orWhere('unit', 'LIKE', "%$search%");
+                        });
+                });
+            $monitoringForms = $query->paginate(5);
+
             } else {
                 $monitoringForms = (clone $query)
                     ->orWhere('reviewed_by', $name)->paginate(5);
@@ -157,7 +161,7 @@ class ResearchMonitoringFormController extends Controller
                 $data = $researchMonitoringForm->fresh('intellectualproperty', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
                 break;
             case 7:
-                $data = $researchMonitoringForm->fresh('peerReview', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('peerreview', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
                 break;
             case 8:
                 $data = $researchMonitoringForm->fresh('otherresearch', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
@@ -176,53 +180,75 @@ class ResearchMonitoringFormController extends Controller
     public function updateCoordinator(Request $request, ResearchMonitoringForm $form)
     {
         $isRejected = false;
+        $isResubmission = false;
         $documents = $form->researchdocuments;
         $user = Auth::user();
 
-        if (count($documents)  < 1 && $request->status[0] === DocumentStatus::REJECTED->value) {
-            $isRejected = true;
+        if ($request->status[0] === ResearchMonitoringFormStatus::RESUBMISSION->value) {
+            $isResubmission = true;
         } else {
-
-            foreach ($documents as $index => $document) {
-
-                $doc = $request->status[$index];
-
-                $document->update(['status' => $doc]);
-
-                if ($doc == DocumentStatus::REJECTED->value) {
-                    $isRejected = true;
-                }
-            };
+            if (count($documents) < 1 && $request->status[0] === DocumentStatus::REJECTED->value) {
+                $isRejected = true;
+            } else {
+                foreach ($documents as $index => $document) {
+                    $doc = $request->status[$index];
+                    $document->update(['status' => $doc]);
+                    if ($doc == DocumentStatus::REJECTED->value) {
+                        $isRejected = true;
+                    }
+                };
+            }
         }
-        if ($isRejected) {
 
+        if ($isResubmission) {
             $form->update([
-                'status' => ResearchMonitoringFormStatus::REJECTED,
+                'status'           => ResearchMonitoringFormStatus::RESUBMISSION,
+                'reviewed_by'      => $user->getFullName(),
+                'reviewed_at'      => now()->format('m/d/Y h:i a'),
+                'rejected_message' => $request->rejected_message,
+            ]);
+
+            $status = ResearchMonitoringFormStatus::RESUBMISSION->value;
+        } elseif ($isRejected) {
+            $form->update([
+                'status'           => ResearchMonitoringFormStatus::REJECTED,
+                'reviewed_by'      => $user->getFullName(),
+                'reviewed_at'      => now()->format('m/d/Y h:i a'),
+                'rejected_message' => $request->rejected_message,
+            ]);
+
+            $status = ResearchMonitoringFormStatus::REJECTED->value;
+        } else {
+            $form->update([
+                'status'      => ResearchMonitoringFormStatus::APPROVED,
                 'reviewed_by' => $user->getFullName(),
                 'reviewed_at' => now()->format('m/d/Y h:i a'),
-                'rejected_message' => $request->rejected_message
             ]);
-        } else {
 
-            $form->update([
-                'status' => ResearchMonitoringFormStatus::APPROVED,
-                'reviewed_by' => $user->getFullName(),
-                'reviewed_at' => now()->format('m/d/Y h:i a')
-            ]);
+            $status = ResearchMonitoringFormStatus::APPROVED->value;
         }
 
-        $user = User::find($form->users_id);
-
         $admins = User::role(RoleEnum::ADMIN);
+        $faculty = User::find($form->users_id);
 
-        $status = $isRejected ? ResearchMonitoringFormStatus::REJECTED->value : ResearchMonitoringFormStatus::APPROVED->value;
+        Notification::send($admins, new ResearchMonitoringFormNotification(
+            'Research Monitoring Form has been ' . $status,
+            'admin/research-monitoring-form/' . $form->id,
+            '',
+            ''
+        ));
 
-        Notification::send($admins, new ResearchMonitoringFormNotification('Research Monitoring Form has been ' . $status, 'admin/research-monitoring-form/' . $form->id, '', ''));
-
-        $user->notify(new ResearchMonitoringFormNotification('Your research monitoring form has been ' . $status, 'faculty/research-monitoring-form/' . $form->id, $user->image_path ?? '', ''));
+        $faculty->notify(new ResearchMonitoringFormNotification(
+            'Your research monitoring form requires ' . $status,
+            'faculty/research-monitoring-form/' . $form->id,
+            $faculty->image_path ?? '',
+            ''
+        ));
 
         return $this->success($form, 'Research Monitoring Form and Research Document status updated');
     }
+
+
     public function updateAdmin(Request $request, ResearchMonitoringForm $form)
     {
         $status = '';
@@ -277,4 +303,26 @@ class ResearchMonitoringFormController extends Controller
 
         return $this->success('', 'Research Monitoring Form deleted successfully');
     }
+
+    public function addDocument(Request $request, ResearchMonitoringForm $researchMonitoringForm)
+    {
+        $request->validate(['file_path' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240']);
+
+        $file = $request->file('file_path');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+
+        // Store directly to the documents directory on the local disk
+        $storedPath = $file->storeAs('documents', $fileName, 'local');
+
+        $researchMonitoringForm->researchdocuments()->create([
+            'file_path' => $storedPath,
+            'status'    => ResearchMonitoringFormStatus::PENDING->value,
+        ]);
+
+        $researchMonitoringForm->refresh()->load('researchdocuments');
+
+        return $this->success($researchMonitoringForm, 'Document added successfully');
+    }
+
+
 }

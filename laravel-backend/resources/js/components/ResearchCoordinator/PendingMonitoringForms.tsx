@@ -5,6 +5,8 @@ import Pagination from "../shared/components/Pagination";
 import React, { useEffect, useRef } from "react";
 import { STATUS_TYPE } from "../shared/types/types";
 import { IoSearch } from "react-icons/io5";
+import Badge from "../shared/components/Badge";
+
 
 const PendingMonitoringForms = () => {
   const { coordinatorData, setParams, loading, refetchData } =
@@ -84,6 +86,9 @@ const PendingMonitoringForms = () => {
                     Points
                   </th>
                   <th scope="col" className="px-6 py-3">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3">
                     Rating
                   </th>
                 </tr>
@@ -115,6 +120,16 @@ const PendingMonitoringForms = () => {
                     </td>
                     <td className="px-6 py-3">{parseDate(item.created_at)}</td>
                     <td className="px-6 py-3">{item.points?.points}</td>
+                                        <td className="px-6 py-3">
+                      {item.status === STATUS_TYPE.RESUBMISSION ? (
+                        <div className="flex items-center gap-1 flex-wrap">
+                          <Badge type={STATUS_TYPE.PENDING} />
+                          <Badge type={STATUS_TYPE.RESUBMISSION} />
+                        </div>
+                      ) : (
+                        <Badge type={item.status} />
+                      )}
+                    </td>
                     <td className="px-6 py-3 capitalize">
                       {item.points?.rating}
                     </td>

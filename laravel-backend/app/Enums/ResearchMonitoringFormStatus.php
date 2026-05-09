@@ -8,4 +8,5 @@ enum ResearchMonitoringFormStatus: string
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
     case EVALUATED = 'evaluated';
+    case RESUBMISSION = 'resubmission';
 }

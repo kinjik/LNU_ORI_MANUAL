@@ -115,9 +115,9 @@ class ResearchMonitoringForm extends Model
         return $this->hasOne(IntellectualProperty::class, 'researchmonitoringform_id');
     }
 
-    public function peerReview(): HasOne
+    public function peerreview()
     {
-        return $this->hasOne(PeerReview::class);
+        return $this->hasOne(PeerReview::class, 'researchmonitoringform_id');
     }
 
     public function creativeworksperformingarts(): HasOne

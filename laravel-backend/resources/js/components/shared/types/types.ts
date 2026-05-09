@@ -95,11 +95,10 @@ export type OtherResearchType = {
 
 export type PeerReviewType = {
   name: string;
-  journal_name: string;
   article_title: string;
-  article_reviewed: number;
+  article_reviewed: string;
   abstract_title: string;
-  abstract_reviewed: number;
+  abstract_reviewed: string;
   coverage: string;
   date_reviewed: string;
   organization: string;
@@ -177,6 +176,7 @@ export const STATUS_TYPE = {
   REJECT: "rejected",
   PENDING: "pending",
   EVALUATED: "evaluated",
+  RESUBMISSION: "resubmission",
 };
 
 export const COVERAGES = {
@@ -199,10 +199,11 @@ export type CitationsType = {
   url_link: string;
   scopus_link: string;
   researchmonitoringform_id: number;
+  documents?: Researchdocument[];
 };
 
 export type StatusType = {
-  status: "pending" | "approved" | "evaluated" | "rejected";
+  status: "pending" | "approved" | "evaluated" | "rejected" | "resubmission";
 };
 
 export type Ongoingresearchprod = {
@@ -223,6 +224,7 @@ export type Presentedresearchprod = {
   researchmonitoringform_id: number;
   created_at: Date;
   updated_at: Date;
+  rejected_message: string | null;
 };
 
 export type Publishedresearchprod = {

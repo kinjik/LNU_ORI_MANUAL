@@ -121,6 +121,7 @@ const MonitoringFormDetails = () => {
             status={data.status}
             documents={data.researchdocuments}
             completed={data.completedresearchprod}
+            coauthors={data?.coauthors}
           />
         )}
         {data?.citations && (

@@ -55,20 +55,15 @@ const fetchCompletedPoints = async () => {
   return res.data.data.points;
 };
 
-export const useGetCompletedPoints = (authors: string | undefined) => {
+export const useGetCompletedPoints = (authorCount: number) => {
   const query = useQuery({
     queryKey: ["completedPoints"],
     queryFn: fetchCompletedPoints,
-    enabled: !!authors,
     staleTime: 5 * 60 * 1000,
   });
 
-  const arrAuthors = authors?.split(",");
   const totalPoints = query.data ?? 0;
-  const points =
-    arrAuthors?.length === 1
-      ? totalPoints
-      : totalPoints / (arrAuthors?.length || 1);
+  const points = authorCount <= 1 ? totalPoints : totalPoints / authorCount;
 
   return {
     points,

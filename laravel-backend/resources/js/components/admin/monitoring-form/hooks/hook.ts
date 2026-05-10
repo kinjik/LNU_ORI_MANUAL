@@ -80,6 +80,7 @@ type AdminDashboardType = {
 
 export type FacultyDashboard = {
   recent: ResearchMonitoringForm[];
+  shared_forms: ResearchMonitoringForm[];
   totalPoints: number;
   totalSubmission: number;
   rating: string;
@@ -96,6 +97,17 @@ export const useFacultyDashboard = () => {
   });
 
   return { data, ...query };
+};
+
+export const useFacultyList = () => {
+  return useQuery<{ id: number; name: string }[]>({
+    queryKey: ["facultyList"],
+    queryFn: async () => {
+      const res = await api.get("/api/users/faculty");
+      return res.data.data;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
 };
 
 export const useFacultyMonitoringForm = () => {

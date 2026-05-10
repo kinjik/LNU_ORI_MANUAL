@@ -31,7 +31,7 @@ export type FormData = {
   agenda_mappings: number[];
   // selectedFile: number | null;
   completed: Completedresearchprod &
-    Omit<Research, "id" | "user_id"> & { points: number };
+    Omit<Research, "id" | "user_id"> & { points: number; author_ids: number[] };
   presented: Presentedresearchprod & { points: number };
   published: Publishedresearchprod &
     Omit<Research, "id" | "user_id"> & { points: number };
@@ -72,6 +72,7 @@ const CreateResearchMonitoringForm = () => {
         title: "",
         authorship_nature: "",
         authors: "",
+        author_ids: [],
         research_field_id: 1,
         research_type_id: 1,
         socio_economic_objective_id: 1,

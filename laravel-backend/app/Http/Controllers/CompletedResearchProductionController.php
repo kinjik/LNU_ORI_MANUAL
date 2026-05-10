@@ -94,7 +94,7 @@ class CompletedResearchProductionController extends Controller
             $researchAttr = [
                 'title' => $request->completed['title'],
                 'authorship_nature' => $request->completed['authorship_nature'],
-                'authors' => $request->completed['authors'],
+                'authors' => !empty($request->completed['authors']) ? $request->completed['authors'] : 'Multiple Authors (See Database)',
                 'research_field_id' => $request->completed['research_field_id'],
                 'research_type_id'=> $request->completed['research_type_id'],
                 'socio_economic_objective_id' => $request->completed['socio_economic_objective_id'],
@@ -121,6 +121,13 @@ class CompletedResearchProductionController extends Controller
             'rating' => $rating,
             'researchmonitoringform_id' => $researchForm->id
             ]);
+
+            // Sync co-authors to the pivot table
+            // Always include the submitter; merge with any additional IDs sent from the form
+            $authorIds = $request->completed['author_ids'] ?? [];
+            // Cast to int array and ensure submitter is always present
+            $authorIds = array_unique(array_map('intval', [...$authorIds, Auth::id()]));
+            $researchForm->coauthors()->sync($authorIds);
 
             $user = auth()->user();
 

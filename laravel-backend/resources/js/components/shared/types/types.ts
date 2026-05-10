@@ -83,6 +83,7 @@ export type MonitoringFormDetailsType = {
   intellectualproperty: IntellectualPropertyType;
   researchdocuments: Researchdocument[];
   points: Points;
+  coauthors?: any[];
 };
 
 export type OtherResearchType = {

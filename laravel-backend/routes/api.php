@@ -84,6 +84,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/faculty-archives', [FacultyController::class, 'archivedSubmission']);
     Route::get('faculty-dashboard', [FacultyController::class, 'index'])->middleware('role:faculty');
     Route::get('faculty-monitoring-forms', [FacultyController::class, 'monitoringForms'])->middleware('role:faculty');
+    Route::get('/users/faculty', [FacultyController::class, 'facultyList'])->middleware('role:faculty|admin|research_coordinator');
 
     Route::get('/backup-list', [SystemBackupController::class, 'index'])->middleware('role:admin');
     Route::get('/backup', [SystemBackupController::class, 'backup'])->middleware('role:admin');

@@ -1,6 +1,6 @@
 import Card from "../sidebar/Card";
 import { Link, useNavigate } from "react-router-dom";
-import { LuFileChartColumn, LuFileDigit, LuFileStack } from "react-icons/lu";
+import { LuFileChartColumn, LuFileDigit, LuFileStack, LuUsers } from "react-icons/lu";
 import { parseDate } from "../util/parseDate";
 import { useFacultyDashboard } from "../admin/monitoring-form/hooks/hook";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -95,6 +95,49 @@ const FacultyDashboard = () => {
           progressPending={loading}
         />
       </div>
+
+      {/* ── Shared / Co-authored Forms ── */}
+      {(data?.shared_forms?.length ?? 0) > 0 && (
+        <>
+          <div className="flex items-end justify-between">
+            <h1 className="mb-3 mt-16 flex items-center gap-2 text-xl font-semibold">
+              <LuUsers className="text-indigo-500" />
+              Shared Monitoring Forms
+            </h1>
+          </div>
+          <p className="-mt-2 mb-4 text-sm text-gray-500">
+            Forms submitted by other faculty members where you are listed as a co-author.
+          </p>
+          <div className="rounded-md bg-white p-5 shadow-custom">
+            <DataTable
+              columns={[
+                ...column,
+                {
+                  name: "Submitted By",
+                  cell: (row) => (
+                    <p className="capitalize">
+                      {row.users
+                        ? `${row.users.fname} ${row.users.lname}`
+                        : "—"}
+                    </p>
+                  ),
+                },
+              ]}
+              // data={data.shared_forms
+              data={data?.shared_forms || []}
+              onRowClicked={(row) =>
+                navigate(`/faculty/research-monitoring-form/${row.id}`)
+              }
+              pointerOnHover
+              highlightOnHover
+              progressComponent={
+                <AiOutlineLoading3Quarters className="size-7 animate-spin" />
+              }
+              progressPending={loading}
+            />
+          </div>
+        </>
+      )}
     </section>
   );
 };

@@ -15,6 +15,7 @@ import { parseDate } from "../../../util/parseDate";
 type CompletedResearchFormProps = {
   completed: Completedresearchprod;
   status: string;
+  coauthors?: any[];
   documents: Researchdocument[];
 };
 
@@ -22,6 +23,7 @@ function CompletedResearch({
   completed,
   status,
   documents,
+  coauthors,
 }: CompletedResearchFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -108,9 +110,22 @@ function CompletedResearch({
           className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
         />
         <p className="mb-1 mt-5 text-sm">Author(s)</p>
-        <span className="text-sm tracking-wide">
-          {completed.research.authors}
-        </span>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {coauthors && coauthors.length > 0 ? (
+            coauthors.map((author) => (
+              <span
+                key={author.id}
+                className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+              >
+                {author.fname} {author.lname}
+              </span>
+            ))
+          ) : (
+            <span className="text-sm tracking-wide">
+              {completed.research.authors}
+            </span>
+          )}
+        </div>
         <label
           htmlFor="researchTitle"
           className="mb-1 mt-5 text-sm font-semibold"

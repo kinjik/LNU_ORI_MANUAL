@@ -84,7 +84,7 @@ class ResearchMonitoringFormController extends Controller
                     ->count();
             }
 
-            $monitoringForms->load('researchdocuments', 'researchinvolvement:id,research_involvement_type', 'users', 'points:id,points,rating,researchmonitoringform_id');
+            $monitoringForms->load('researchdocuments', 'researchinvolvement:id,research_involvement_type', 'users', 'points:id,points,rating,researchmonitoringform_id', 'coauthors');
 
             return $this->success(['forms' => $monitoringForms, 'totalPending' => $totalPending, 'totalApproved' => $totalApproved, 'totalRejected' => $totalRejected], 'Data retrieved successfully');
         }
@@ -143,28 +143,28 @@ class ResearchMonitoringFormController extends Controller
         switch ($researchInvolvement) {
 
             case 1:
-                $data = $researchMonitoringForm->fresh('completedresearchprod.research', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('completedresearchprod.research', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
                 break;
             case 2:
-                $data = $researchMonitoringForm->fresh('presentedresearchprod', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('presentedresearchprod', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
                 break;
             case 3:
-                $data = $researchMonitoringForm->fresh('publishedresearchprod.research', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('publishedresearchprod.research', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
                 break;
             case 4:
-                $data = $researchMonitoringForm->fresh('citations', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('citations', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
                 break;
             case 5:
-                $data = $researchMonitoringForm->fresh('attendancetoresearch', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('attendancetoresearch', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
                 break;
             case 6:
-                $data = $researchMonitoringForm->fresh('intellectualproperty', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('intellectualproperty', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
                 break;
             case 7:
-                $data = $researchMonitoringForm->fresh('peerreview', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('peerreview', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
                 break;
             case 8:
-                $data = $researchMonitoringForm->fresh('otherresearch', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+                $data = $researchMonitoringForm->fresh('otherresearch', 'researchinvolvement:id,research_involvement_type', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
                 break;
 
             default:

@@ -39,7 +39,12 @@ class FacultyController extends Controller
     {
         $user = auth()->user();
 
-        $totalSubmission = ResearchMonitoringForm::where('users_id', $user->id)->count();
+        $totalSubmission = ResearchMonitoringForm::where(function ($q) use ($user) {
+            $q->where('users_id', $user->id)
+              ->orWhereHas('coauthors', function ($cq) use ($user) {
+                  $cq->where('user_id', $user->id);
+              });
+        })->count();
 
         $forms = ResearchMonitoringForm::where('users_id', $user->id)
                                         ->with(['researchinvolvement:id,research_involvement_type',
@@ -48,12 +53,14 @@ class FacultyController extends Controller
                                         ->get()
                                         ->take(5);
 
-        $totalPoints = Point::whereRelation('researchmonitoringform', function ($query) use ($user) {
-            $query->where('users_id', $user->id)
-                    ->where(function ($query) {
-                        $query->where('status', ResearchMonitoringFormStatus::APPROVED)
-                            ->orWhere('status', ResearchMonitoringFormStatus::EVALUATED);
-                    });
+        $totalPoints = Point::whereHas('researchmonitoringform', function ($query) use ($user) {
+            $query->where(function ($q) use ($user) {
+                $q->where('users_id', $user->id)
+                  ->orWhereHas('coauthors', function ($cq) use ($user) {
+                      $cq->where('user_id', $user->id);
+                  });
+            })
+            ->whereIn('status', [ResearchMonitoringFormStatus::APPROVED, ResearchMonitoringFormStatus::EVALUATED]);
         })->sum('points');
 
         $rating = $this->rating($totalPoints);
@@ -70,11 +77,26 @@ class FacultyController extends Controller
                 }
             }
 
+        // Forms where the logged-in faculty was tagged as a co-author (but is not the primary owner)
+        $sharedForms = ResearchMonitoringForm::whereHas('coauthors', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->where('users_id', '!=', $user->id)
+            ->with([
+                'researchinvolvement:id,research_involvement_type',
+                'points:researchmonitoringform_id,points,rating,id',
+                'coauthors',
+                'users' => function ($q) { $q->select('id', 'fname', 'lname', 'mi', 'suffix'); },
+            ])
+            ->latest()
+            ->get();
+
             $data = [
-                'recent' => $forms,
-                'totalPoints' => $totalPoints,
+                'recent'        => $forms,
+                'shared_forms'  => $sharedForms,
+                'totalPoints'   => $totalPoints,
                 'totalSubmission' => $totalSubmission,
-                'rating' => $rating,
+                'rating'        => $rating,
             ];
 
             return $this->success($data, 'Data retrieved successfully');
@@ -84,25 +106,45 @@ class FacultyController extends Controller
     {
         $user = auth()->user();
 
-    //    $academic = AcademicYear::first();
-        // $academic = AcademicYear::latest()->first();
         $academic = AcademicYear::where('is_submission_enable', true)->first();
-
-        // $isAllowed = $academic->is_submission_enable;
-        // $isAllowed = $academic ? $academic->is_submission_enable : false;
         $isAllowed = $academic ? true : false;
 
-       $forms = ResearchMonitoringForm::where('users_id', $user->id)
-                                        ->with(['researchinvolvement:id,research_involvement_type',
-                                        'points:researchmonitoringform_id,points,rating,id',])
-                                        ->latest()
-                                        ->get();
+       $forms = ResearchMonitoringForm::where(function ($q) use ($user) {
+            $q->where('users_id', $user->id)
+              ->orWhereHas('coauthors', function ($cq) use ($user) {
+                  $cq->where('user_id', $user->id);
+              });
+        })
+        ->with([
+            'researchinvolvement:id,research_involvement_type',
+            'points:researchmonitoringform_id,points,rating,id',
+            'coauthors'
+        ])
+        ->latest()
+        ->get();
 
        return $this->success([
-        'forms' => $forms,
+        'forms'  => $forms,
         'enable' => $isAllowed
        ]);
 
+    }
+
+    /**
+     * Return a compact list of all faculty users (id + full name) for the co-author dropdown.
+     */
+    public function facultyList()
+    {
+        $users = \App\Models\User::role(\App\Enums\RoleEnum::FACULTY)
+            ->select('id', 'fname', 'lname', 'mi', 'suffix')
+            ->orderBy('lname')
+            ->get()
+            ->map(fn ($u) => [
+                'id'   => $u->id,
+                'name' => $u->getFullName(),
+            ]);
+
+        return $this->success($users, 'Faculty list retrieved successfully');
     }
 
     public function validateDocument(Request $request)
@@ -667,7 +709,12 @@ class FacultyController extends Controller
     {
         $archived = ResearchMonitoringForm::withoutGlobalScope('archive')
                                     ->where('is_archived', true)
-                                    ->where('users_id', auth()->id())
+                                    ->where(function ($q) {
+                                        $q->where('users_id', auth()->id())
+                                          ->orWhereHas('coauthors', function ($cq) {
+                                              $cq->where('user_id', auth()->id());
+                                          });
+                                    })
                                     ->with([
                                         'researchinvolvement:id,research_involvement_type',
                                         'points:researchmonitoringform_id,points,rating,id',

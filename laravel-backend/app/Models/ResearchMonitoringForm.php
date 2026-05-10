@@ -50,6 +50,11 @@ class ResearchMonitoringForm extends Model
         });
     }
 
+    public function coauthors(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'research_monitoring_form_coauthors', 'researchmonitoringform_id', 'user_id')->withTimestamps();
+    }
+
     public function sdgMappings(): BelongsToMany
     {
         return $this->belongsToMany(SdgMapping::class, 'research_sdg', 'researchmonitoringform_id', 'sdgmapping_id');

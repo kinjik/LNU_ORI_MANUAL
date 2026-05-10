@@ -3,14 +3,16 @@ import {
   Control,
   FieldErrors,
   useController,
-  UseFormRegister,
-  useWatch,
+  UseFormRegister
 } from "react-hook-form";
 import { FormData } from "../CreateResearchMonitoringForm";
 
 import { CiCircleQuestion } from "react-icons/ci";
+import { useFacultyList } from "../../../admin/monitoring-form/hooks/hook";
+import api from "../../../api/axios";
 import Tooltip from "../../../shared/components/Tooltip";
 import { FundSourceNatureEnum } from "../../../shared/types/types";
+import CoAuthorSelect from "../components/CoAuthorSelect";
 import { useGetCompletedPoints } from "../points/usePoints";
 
 type ResearchType = { type: string; id: number };
@@ -40,9 +42,26 @@ const CompletedResearch = ({
     name: "completed.points",
     control,
   });
-  const authors = useWatch({ name: "completed.authors", control });
+  const { field: authorIdsField } = useController({
+    name: "completed.author_ids",
+    control,
+  });
 
-  const { points: completedPoints, total } = useGetCompletedPoints(authors);
+  const [currentUserId, setCurrentUserId] = React.useState<number>(0);
+  useEffect(() => {
+    api.get("/api/user").then((res) => {
+      setCurrentUserId(res.data.id);
+      if (!authorIdsField.value?.includes(res.data.id)) {
+        authorIdsField.onChange([...(authorIdsField.value ?? []), res.data.id]);
+      }
+    });
+  }, []);
+
+  const { data: facultyList = [] } = useFacultyList();
+  const selectedAuthorCount = (authorIdsField.value?.length ?? 1) || 1;
+  const { points: completedPoints, total } = useGetCompletedPoints(
+    selectedAuthorCount,
+  );
 
   useEffect(() => {
     points.onChange(completedPoints);
@@ -82,15 +101,16 @@ const CompletedResearch = ({
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
             htmlFor="authors"
           >
-            Author(s)
+            Author(s) / Co-Author(s)
           </label>
-          <input
-            id="authors"
-            className="h-9 rounded-md border border-gray-800 p-1"
-            {...register("completed.authors", { required: true })}
+          <CoAuthorSelect
+            options={facultyList}
+            value={authorIdsField.value ?? []}
+            onChange={authorIdsField.onChange}
+            currentUserId={currentUserId}
           />
           <p className="my-1.5 text-red-500">
-            {errors.completed?.authors?.message}
+            {errors.completed?.author_ids?.message}
           </p>
         </div>
         <div className="flex flex-col gap-2">

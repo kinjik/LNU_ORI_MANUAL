@@ -27,7 +27,7 @@ class ResearchMonitoringFormPolicy
             return true;
         }
     
-        return $user->id == $researchMonitoringForm->users->id;
+        return $user->id == $researchMonitoringForm->users_id || $researchMonitoringForm->coauthors->contains($user->id);
     }
 
     /**
@@ -47,7 +47,7 @@ class ResearchMonitoringFormPolicy
             return true;
         } 
         
-        return $user->id == $researchMonitoringForm->users->id;
+        return $user->id == $researchMonitoringForm->users_id || $researchMonitoringForm->coauthors->contains($user->id);
     }
 
     /**
@@ -59,7 +59,7 @@ class ResearchMonitoringFormPolicy
             return true;
         }
     
-        return $user->id == $researchMonitoringForm->users->id;
+        return $user->id == $researchMonitoringForm->users_id;
     }
 
     /**

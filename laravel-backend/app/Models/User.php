@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Traits\HasRoles;
 
 
@@ -75,6 +76,11 @@ class User extends Authenticatable
     public function researchMonitoringForm(): HasMany
     {
         return $this->hasMany(ResearchMonitoringForm::class, 'users_id');
+    }
+
+    public function coauthoredForms(): BelongsToMany
+    {
+        return $this->belongsToMany(ResearchMonitoringForm::class, 'research_monitoring_form_coauthors', 'user_id', 'researchmonitoringform_id')->withTimestamps();
     }
 
     protected function fname(): Attribute

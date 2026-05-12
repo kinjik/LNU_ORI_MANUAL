@@ -110,6 +110,12 @@ class ResearchAttendanceController extends Controller
                         'attendance_nature' => $validated['participation']['attendance_nature']
                     ]);
 
+                    $authorIds = $validated['participation']['author_ids'] ?? [];
+                    if (!in_array(Auth::id(), $authorIds)) {
+                        $authorIds[] = Auth::id();
+                    }
+                    $participation->researchmonitoringform->coauthors()->sync($authorIds);
+
                     $docs = $participation->researchmonitoringform->researchdocuments;
 
                     foreach($docs as $doc) {
@@ -193,6 +199,12 @@ class ResearchAttendanceController extends Controller
             $participationAttr['researchmonitoringform_id'] = $researchForm->id;
 
             ResearchAttendance::create($participationAttr);
+
+            $authorIds = $validated['participation']['author_ids'] ?? [];
+            if (!in_array(Auth::id(), $authorIds)) {
+                $authorIds[] = Auth::id();
+            }
+            $researchForm->coauthors()->sync($authorIds);
 
             $rating = $this->rating($points);
 

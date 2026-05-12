@@ -11,6 +11,10 @@ import { FormData } from "../CreateResearchMonitoringForm";
 import { CiCircleQuestion } from "react-icons/ci";
 import Tooltip from "../../../shared/components/Tooltip";
 import { useGetPeerReviewPoints } from "../points/usePoints";
+import CoAuthorSelect from "../components/CoAuthorSelect";
+import { useFacultyList } from "../../../admin/monitoring-form/hooks/hook";
+import { useState } from "react";
+import api from "../../../api/axios";
 
 type PeerReviewProps = {
   register: UseFormRegister<FormData>;
@@ -24,6 +28,25 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
     control,
   });
 
+  const { field: authorIdsField } = useController({
+    name: "peerjournal.author_ids",
+    control,
+  });
+
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+  useEffect(() => {
+    api.get("/api/user").then((res) => {
+      setCurrentUserId(res.data.id);
+      if (!authorIdsField.value?.includes(res.data.id)) {
+        authorIdsField.onChange([...(authorIdsField.value ?? []), res.data.id]);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data: facultyList = [] } = useFacultyList();
+  const selectedAuthorCount = (authorIdsField.value?.length ?? 1) || 1;
+
   const coverage = useWatch({ name: "peerjournal.coverage", control });
   const article = useWatch({ name: "peerjournal.article_reviewed", control });
   const abstract = useWatch({ name: "peerjournal.abstract_reviewed", control });
@@ -34,6 +57,7 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
     coverage?.toLowerCase(),
     Number(article) || 0,
     Number(abstract) || 0,
+    selectedAuthorCount,
   );
 
   useEffect(() => {
@@ -65,6 +89,25 @@ const PeerReview = ({ register, errors, control }: PeerReviewProps) => {
           />
           <p className="my-1.5 text-red-500">
             {errors.peerjournal?.name?.message}
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label
+            className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
+            htmlFor="reviewerName"
+          >
+            Referee/Reviewer Name(s)
+          </label>
+          <CoAuthorSelect
+            options={facultyList}
+            value={authorIdsField.value ?? []}
+            onChange={authorIdsField.onChange}
+            currentUserId={currentUserId}
+            label="Referee/Reviewer Name(s)"
+          />
+          <p className="my-1.5 text-red-500">
+            {errors.peerjournal?.author_ids?.message}
           </p>
         </div>
 

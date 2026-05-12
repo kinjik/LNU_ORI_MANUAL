@@ -16,11 +16,13 @@ type IntellectualPropertyDetailsType = {
   intellectualproperty: IntellectualPropertyType;
   documents: Researchdocument[];
   status: string;
+  coauthors?: any[];
 };
 const IntellectualPropertyDetails = ({
   intellectualproperty,
   documents,
   status,
+  coauthors,
 }: IntellectualPropertyDetailsType) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -75,14 +77,24 @@ const IntellectualPropertyDetails = ({
           className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
         />
         <label htmlFor="fundSource" className="mt-5 text-sm font-semibold">
-          Owner Name:
+          Inventor/Creator Name(s):
         </label>
-        <input
-          id="fundSource"
-          value={intellectualproperty.owner_name}
-          disabled
-          className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
-        />
+        <div className="flex flex-wrap gap-2 mt-1">
+          {coauthors && coauthors.length > 0 ? (
+            coauthors.map((author) => (
+              <span
+                key={author.id}
+                className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+              >
+                {author.fname} {author.lname}
+              </span>
+            ))
+          ) : (
+            <span className="text-sm tracking-wide capitalize">
+              {intellectualproperty.owner_name}
+            </span>
+          )}
+        </div>
         <label htmlFor="datePublication" className="mt-5 text-sm font-semibold">
           Registration Date
         </label>

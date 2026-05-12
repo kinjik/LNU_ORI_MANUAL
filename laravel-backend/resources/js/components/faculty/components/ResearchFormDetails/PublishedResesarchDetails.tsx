@@ -16,12 +16,14 @@ type PublishedResearchDetailsType = {
   published: Publishedresearchprod;
   documents: Researchdocument[];
   status: string;
+  coauthors?: any[];
 };
 
 function PublishedResearchDetails({
   published,
   documents,
   status,
+  coauthors,
 }: PublishedResearchDetailsType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -87,9 +89,22 @@ function PublishedResearchDetails({
         </div>
         <div>
           <h2 className="font-semibold">Authors</h2>
-          <p className="pl-5 capitalize underline">
-            {published.research.authors}
-          </p>
+          <div className="flex flex-wrap gap-2 mt-1 pl-5">
+            {coauthors && coauthors.length > 0 ? (
+              coauthors.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm tracking-wide capitalize underline">
+                {published.research.authors}
+              </span>
+            )}
+          </div>
         </div>
         <div>
           <h2 className="font-semibold">Publisher</h2>

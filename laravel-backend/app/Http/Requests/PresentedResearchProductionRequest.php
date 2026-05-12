@@ -37,7 +37,9 @@ class PresentedResearchProductionRequest extends FormRequest
             'presented.conference_place' => 'required|string|max:255',
             'presented.conference_organization' => 'required|string|max:255',
             'presented.presentation_title' => 'required|string|max:255',
-            'presented.presenter_name' => 'required|string|max:255',
+            'presented.presenter_name' => 'nullable|string|max:255',
+            'presented.author_ids' => 'required|array',
+            'presented.author_ids.*' => 'integer|exists:users,id',
             'presented.points' => 'required|numeric|min:0',
         ];
     }

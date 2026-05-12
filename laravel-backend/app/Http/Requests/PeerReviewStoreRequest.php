@@ -38,6 +38,8 @@ class PeerReviewStoreRequest extends FormRequest
             'peerjournal.coverage' => ['string','required'],
             'peerjournal.date_reviewed' => ['date','required'],
             'peerjournal.organization' => ['string','required'],
+            'peerjournal.author_ids' => ['required', 'array'],
+            'peerjournal.author_ids.*' => ['integer', 'exists:users,id'],
             'peerjournal.points' => ['integer','required'],
         ];
     }

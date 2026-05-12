@@ -32,13 +32,13 @@ export type FormData = {
   // selectedFile: number | null;
   completed: Completedresearchprod &
     Omit<Research, "id" | "user_id"> & { points: number; author_ids: number[] };
-  presented: Presentedresearchprod & { points: number };
+  presented: Presentedresearchprod & { points: number; author_ids: number[] };
   published: Publishedresearchprod &
-    Omit<Research, "id" | "user_id"> & { points: number };
-  citations: CitationsType & { points: number };
-  participation: ResearchAttendance & { points: number };
-  intellectual: IntellectualPropertyType & { points: number };
-  peerjournal: PeerReviewType & { points: number };
+    Omit<Research, "id" | "user_id"> & { points: number; author_ids: number[] };
+  citations: CitationsType & { points: number; author_ids: number[] };
+  participation: ResearchAttendance & { points: number; author_ids: number[] };
+  intellectual: IntellectualPropertyType & { points: number; author_ids: number[] };
+  peerjournal: PeerReviewType & { points: number; author_ids: number[] };
   otherresearch: OtherResearchType & { points: number };
 };
 
@@ -90,12 +90,14 @@ const CreateResearchMonitoringForm = () => {
         conference_organization: "",
         presentation_title: "",
         presenter_name: "",
+        author_ids: [],
         points: 0,
       },
       published: {
         title: "",
         authorship_nature: "",
         authors: "",
+        author_ids: [],
         research_field_id: 1,
         research_type_id: 1,
         socio_economic_objective_id: 1,
@@ -112,6 +114,7 @@ const CreateResearchMonitoringForm = () => {
       },
       citations: {
         authors: "",
+        author_ids: [],
         cited_authors: "",
         cited_article_title: "",
         research_title: "",
@@ -126,6 +129,7 @@ const CreateResearchMonitoringForm = () => {
       participation: {
         date: "",
         organizer: "",
+        author_ids: [],
         research_title: "",
         coverage: "",
         place: "",
@@ -138,6 +142,7 @@ const CreateResearchMonitoringForm = () => {
         property_type: "",
         title: "",
         owner_name: "",
+        author_ids: [],
         processor_name: "",
         document_id: "",
         registration_date: "",
@@ -149,6 +154,7 @@ const CreateResearchMonitoringForm = () => {
       },
       peerjournal: {
         name: "",
+        author_ids: [],
         article_title: "",
         article_reviewed: "",
         abstract_reviewed: "",

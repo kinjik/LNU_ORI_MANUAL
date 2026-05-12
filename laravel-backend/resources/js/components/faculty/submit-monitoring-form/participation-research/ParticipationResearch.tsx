@@ -12,6 +12,10 @@ import { CiCircleQuestion } from "react-icons/ci";
 import Tooltip from "../../../shared/components/Tooltip";
 import { COVERAGES, FundSourceNatureEnum } from "../../../shared/types/types";
 import { useGetParticipationPoints } from "../points/usePoints";
+import CoAuthorSelect from "../components/CoAuthorSelect";
+import { useFacultyList } from "../../../admin/monitoring-form/hooks/hook";
+import { useState } from "react";
+import api from "../../../api/axios";
 
 type ResearchType = { type: string; id: number };
 type ResearchField = { field: string; id: number };
@@ -40,6 +44,25 @@ const ParticipationResearch = ({
     control,
   });
 
+  const { field: authorIdsField } = useController({
+    name: "participation.author_ids",
+    control,
+  });
+
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+  useEffect(() => {
+    api.get("/api/user").then((res) => {
+      setCurrentUserId(res.data.id);
+      if (!authorIdsField.value?.includes(res.data.id)) {
+        authorIdsField.onChange([...(authorIdsField.value ?? []), res.data.id]);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data: facultyList = [] } = useFacultyList();
+  const selectedAuthorCount = (authorIdsField.value?.length ?? 1) || 1;
+
   const coverage = useWatch({ name: "participation.coverage", control });
   const category = useWatch({
     name: "participation.attendance_nature",
@@ -51,6 +74,7 @@ const ParticipationResearch = ({
     coverage,
     category,
     date,
+    selectedAuthorCount,
   );
 
   useEffect(() => {
@@ -84,6 +108,25 @@ const ParticipationResearch = ({
           />
           <p className="my-1.5 text-red-500">
             {errors.participation?.research_title?.message}
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label
+            className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
+            htmlFor="participants"
+          >
+            Participant Name(s)
+          </label>
+          <CoAuthorSelect
+            options={facultyList}
+            value={authorIdsField.value ?? []}
+            onChange={authorIdsField.onChange}
+            currentUserId={currentUserId}
+            label="Participant Name(s)"
+          />
+          <p className="my-1.5 text-red-500">
+            {errors.participation?.author_ids?.message}
           </p>
         </div>
         

@@ -32,6 +32,7 @@ export const useCitationsPoints = (
   scopus: boolean | null,
   authors: string,
   citedAuthors: string,
+  authorCount: number,
 ) => {
   const query = useQuery({
     queryKey: ["citationPoints", scopus, authors, citedAuthors],
@@ -40,8 +41,11 @@ export const useCitationsPoints = (
     staleTime: 5 * 60 * 1000,
   });
 
+  const totalPointsRaw = query.data?.points ?? 0;
+  const dividedPoints = authorCount <= 1 ? totalPointsRaw : totalPointsRaw / authorCount;
+
   return {
-    points: query.data?.points ?? 0,
+    points: dividedPoints,
     totalPoints: query.data?.totalPoints ?? {
       scopus: null,
       non_scopus: null,
@@ -114,7 +118,8 @@ export const useGetIntellectualPropertyPoints = ({
   publication_date,
   grant_date,
   isLNU,
-}: PropertyType) => {
+  authorCount,
+}: PropertyType & { authorCount: number }) => {
   const status =
     type === "patent/invention" || type === "utility model"
       ? acceptance_date
@@ -149,8 +154,10 @@ export const useGetIntellectualPropertyPoints = ({
     staleTime: 5 * 60 * 1000,
   });
 
+  const dividedPoints = authorCount <= 1 ? points : points / authorCount;
+
   return {
-    points,
+    points: dividedPoints,
     allPoints,
     isLoading: pointsQuery.isLoading || allPointsQuery.isLoading,
     isError: pointsQuery.isError || allPointsQuery.isError,
@@ -161,6 +168,7 @@ export const useGetPeerReviewPoints = (
   coverage: string | undefined,
   abstract: number,
   article: number,
+  authorCount: number,
 ) => {
   const isEnabled = !!coverage && (abstract > 0 || article > 0);
 
@@ -178,12 +186,14 @@ export const useGetPeerReviewPoints = (
     staleTime: 5 * 60 * 1000,
   });
 
-  let points = 0;
+  let totalPointsRaw = 0;
   if (article > 0) {
-    points = article * basePoint;
+    totalPointsRaw = article * basePoint;
   } else if (abstract > 0) {
-    points = abstract * basePoint;
+    totalPointsRaw = abstract * basePoint;
   }
+
+  const points = authorCount <= 1 ? totalPointsRaw : totalPointsRaw / authorCount;
 
   return {
     points,
@@ -195,10 +205,11 @@ export const useGetPeerReviewPoints = (
 export const useGetPresentedPoints = (
   coverage: string | undefined,
   category: string | undefined,
+  authorCount: number,
 ) => {
   const isEnabled = !!coverage && !!category;
 
-  const { data: points = 0, ...query } = useQuery({
+  const { data: totalPoints = 0, ...query } = useQuery({
     queryKey: ["presentedPoints", coverage, category],
     queryFn: async () => {
       const res = await api.post("/api/participation-to-research/points", {
@@ -211,12 +222,14 @@ export const useGetPresentedPoints = (
     staleTime: 5 * 60 * 1000,
   });
 
-  return { points, ...query };
+  const points = authorCount <= 1 ? totalPoints : totalPoints / authorCount;
+
+  return { points, total: totalPoints, ...query };
 };
 
 export const usePublishedResearchPoints = (
   coverage: string | undefined,
-  authors: string | undefined,
+  authorCount: number,
   isScopus?: boolean
 ) => {
   const isEnabled = !!coverage;
@@ -231,9 +244,7 @@ export const usePublishedResearchPoints = (
     staleTime: 5 * 60 * 1000,
   });
 
-  const authorList = authors?.split(",") ?? [];
-  const dividedPoints =
-    authorList.length > 1 ? totalPoints / authorList.length : totalPoints;
+  const dividedPoints = authorCount <= 1 ? totalPoints : totalPoints / authorCount;
 
   return {
     points: dividedPoints,
@@ -247,10 +258,11 @@ export const useGetParticipationPoints = (
   coverage: string | undefined,
   category: string | undefined,
   date: string | Date | undefined,
+  authorCount: number,
 ) => {
   const isEnabled = !!coverage && !!category && !!date;
 
-  const { data: points = 0, ...query } = useQuery({
+  const { data: pointsRaw = 0, ...query } = useQuery({
     queryKey: ["participationPoints", coverage, category, date],
     queryFn: async () => {
       const res = await api.post("/api/participation-to-research/points", {
@@ -264,5 +276,7 @@ export const useGetParticipationPoints = (
     staleTime: 5 * 60 * 1000,
   });
 
-  return { points, ...query };
+  const points = authorCount <= 1 ? pointsRaw : pointsRaw / authorCount;
+
+  return { points, total: pointsRaw, ...query };
 };

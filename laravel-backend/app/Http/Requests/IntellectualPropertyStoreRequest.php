@@ -32,7 +32,9 @@ class IntellectualPropertyStoreRequest extends FormRequest
 
             'intellectual.property_type' => ['string','required'],
             'intellectual.title' => ['string','required'],
-            'intellectual.owner_name' => ['string','required'],
+            'intellectual.owner_name' => ['string','nullable'],
+            'intellectual.author_ids' => ['required','array'],
+            'intellectual.author_ids.*' => ['integer','exists:users,id'],
             'intellectual.processor_name' => ['string','required'],
             'intellectual.document_id' => ['string','required'],
             'intellectual.registration_date' => ['date','required'],

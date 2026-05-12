@@ -11,6 +11,8 @@ type CoAuthorSelectProps = {
   onChange: (ids: number[]) => void;
   /** The currently logged-in user's ID — always selected and cannot be removed */
   currentUserId: number;
+  /** Custom label for the placeholder text */
+  label?: string;
 };
 
 const CoAuthorSelect = ({
@@ -18,6 +20,7 @@ const CoAuthorSelect = ({
   value,
   onChange,
   currentUserId,
+  label = "co-author(s)",
 }: CoAuthorSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -68,7 +71,7 @@ const CoAuthorSelect = ({
       >
         {selectedNames.length === 0 && (
           <span className="px-1 py-0.5 text-sm text-gray-400">
-            Select co-author(s)…
+            Select {label}…
           </span>
         )}
         {selectedNames.map(({ id, name }) => (

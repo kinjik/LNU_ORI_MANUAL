@@ -1,7 +1,0 @@
-node_modules/
-vendor/
-dist/
-build/
-.next/
-storage/logs/
-public/build/

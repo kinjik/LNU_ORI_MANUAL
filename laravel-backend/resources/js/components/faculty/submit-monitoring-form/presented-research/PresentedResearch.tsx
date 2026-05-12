@@ -9,10 +9,13 @@ import {
 } from "react-hook-form";
 import { FormData } from "../CreateResearchMonitoringForm";
 
+import React from "react";
 import { CiCircleQuestion } from "react-icons/ci";
-import { useAuthContextProvider } from "../../../../hooks/hooks";
+import { useFacultyList } from "../../../admin/monitoring-form/hooks/hook";
+import api from "../../../api/axios";
 import Tooltip from "../../../shared/components/Tooltip";
 import { COVERAGES } from "../../../shared/types/types";
+import CoAuthorSelect from "../components/CoAuthorSelect";
 import { useGetPresentedPoints } from "../points/usePoints";
 
 type ResearchType = { type: string; id: number };
@@ -43,21 +46,35 @@ const PresentedResearch = ({
     name: "presented.points",
     control,
   });
+  const { field: authorIdsField } = useController({
+    name: "presented.author_ids",
+    control,
+  });
   const coverage = useWatch({ name: "presented.conference_type", control });
-  const { user } = useAuthContextProvider();
-  const { points: presentedPoints } = useGetPresentedPoints(
-    coverage.toLowerCase(),
+
+  const [currentUserId, setCurrentUserId] = React.useState<number>(0);
+  useEffect(() => {
+    api.get("/api/user").then((res) => {
+      setCurrentUserId(res.data.id);
+      if (!authorIdsField.value?.includes(res.data.id)) {
+        authorIdsField.onChange([...(authorIdsField.value ?? []), res.data.id]);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data: facultyList = [] } = useFacultyList();
+  const selectedAuthorCount = (authorIdsField.value?.length ?? 1) || 1;
+
+  const { points: presentedPoints, total } = useGetPresentedPoints(
+    coverage?.toLowerCase(),
     "presenter",
+    selectedAuthorCount
   );
 
   useEffect(() => {
     points.onChange(presentedPoints);
   }, [presentedPoints, points]);
-  useEffect(() => {
-    if (user) {
-      setValue("presented.presenter_name", `${user.fname} ${user.lname}`);
-    }
-  }, [user, setValue]);
 
 
   return (
@@ -74,17 +91,17 @@ const PresentedResearch = ({
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
             htmlFor="presenterName"
           >
-            Presenter Name
+            Presenter Name(s)
           </label>
-          <input
-            id="presenterName"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize bg-gray-50"
-            {...register("presented.presenter_name", {
-              required: "Presenter name is required",
-            })}
+          <CoAuthorSelect
+            options={facultyList}
+            value={authorIdsField.value ?? []}
+            onChange={authorIdsField.onChange}
+            currentUserId={currentUserId}
+            label="Presenter Name(s)"
           />
           <p className="my-1.5 text-red-500">
-            {errors.presented?.presenter_name?.message}
+            {errors.presented?.author_ids?.message}
           </p>
         </div>
 
@@ -239,7 +256,7 @@ const PresentedResearch = ({
               {points.value}
             </div>
             <Tooltip
-              text={`${coverage} presentations are given ${presentedPoints} points.`}
+              text={`${coverage} presentations are given ${total || 0} points divided by ${selectedAuthorCount} presenter(s).`}
             >
               <CiCircleQuestion className="size-5" />
             </Tooltip>

@@ -16,9 +16,10 @@ type PeerReviewFormType = {
   peerreview: PeerReviewType;
   documents: Researchdocument[];
   status: string;
+  coauthors?: any[];
 };
 
-function PeerReviewForm({ peerreview, documents, status }: PeerReviewFormType) {
+function PeerReviewForm({ peerreview, documents, status, coauthors }: PeerReviewFormType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -62,6 +63,26 @@ function PeerReviewForm({ peerreview, documents, status }: PeerReviewFormType) {
         <div>
           <h2 className="font-semibold">Journal Name:</h2>
           <p className="pl-5 capitalize underline">{peerreview.name}</p>
+        </div>
+
+        <div>
+          <h2 className="font-semibold">Referee/Reviewer Name(s):</h2>
+          <div className="flex flex-wrap gap-2 mt-1 pl-5">
+            {coauthors && coauthors.length > 0 ? (
+              coauthors.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm italic text-gray-500">
+                No reviewers linked.
+              </span>
+            )}
+          </div>
         </div>
 
         <div>

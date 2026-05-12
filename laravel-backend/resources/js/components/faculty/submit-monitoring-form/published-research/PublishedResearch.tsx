@@ -20,6 +20,8 @@ import Button from "../../../shared/components/Button";
 import Tooltip from "../../../shared/components/Tooltip";
 import { coverages, indexes } from "../constants/constant";
 import { usePublishedResearchPoints } from "../points/usePoints";
+import CoAuthorSelect from "../components/CoAuthorSelect";
+import { useFacultyList } from "../../../admin/monitoring-form/hooks/hook";
 
 type ResearchType = { type: string; id: number };
 type ResearchField = { field: string; id: number };
@@ -68,14 +70,32 @@ const PublishedResearch = ({
 
   const journalName = useWatch({ name: "published.journal_name", control });
   const coverage = useWatch({ name: "published.coverage", control });
-  const authors = useWatch({ name: "published.authors", control });
   const title = useWatch({ name: "published.title", control });
   const scopusLink = useWatch({ name: "published.scopus_link", control });
-  const selectedIndex = useWatch({ name: "published.indexing", control });
+  const selectedIndex = useWatch({ name: "published.indexing", control }) || "";
+  const { field: authorIdsField } = useController({
+    name: "published.author_ids",
+    control,
+  });
+
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+  useEffect(() => {
+    api.get("/api/user").then((res) => {
+      setCurrentUserId(res.data.id);
+      if (!authorIdsField.value?.includes(res.data.id)) {
+        authorIdsField.onChange([...(authorIdsField.value ?? []), res.data.id]);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data: facultyList = [] } = useFacultyList();
+  const selectedAuthorCount = (authorIdsField.value?.length ?? 1) || 1;
 
   const { points: publishedPoints, total } = usePublishedResearchPoints(
     coverage,
-    authors,
+    selectedAuthorCount,
+    selectedIndex.includes("Scopus")
   );
 
   const scopusMutation = useMutation({
@@ -102,12 +122,7 @@ const PublishedResearch = ({
     },
   });
 
-  // Automatically set the author to the logged-in user when the component loads
-  useEffect(() => {
-    if (user) {
-      setValue("published.authors", `${user.fname} ${user.lname}`, { shouldValidate: true });
-    }
-  }, [user, setValue]);
+
 
   useEffect(() => {
     points.onChange(publishedPoints);
@@ -172,17 +187,17 @@ const PublishedResearch = ({
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
             htmlFor="authors"
           >
-            Author(s)
+            Author(s) / Co-Author(s)
           </label>
-          <input
-            id="authors"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize bg-gray-50"
-            {...register("published.authors", {
-              required: "This field is required",
-            })}
+          <CoAuthorSelect
+            options={facultyList}
+            value={authorIdsField.value ?? []}
+            onChange={authorIdsField.onChange}
+            currentUserId={currentUserId}
+            label="Author(s) / Co-Author(s)"
           />
           <p className="my-1.5 text-red-500">
-            {errors.published?.authors?.message}
+            {errors.published?.author_ids?.message}
           </p>
         </div>
 

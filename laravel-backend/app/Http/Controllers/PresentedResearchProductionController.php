@@ -181,8 +181,15 @@ class PresentedResearchProductionController extends Controller
 
             $presentedAttr['conference_type'] = strtolower($presentedAttr['conference_type']);
             $presentedAttr['researchmonitoringform_id'] = $researchForm->id;
+            $presentedAttr['presenter_name'] = !empty($validated['presented']['presenter_name']) ? $validated['presented']['presenter_name'] : 'Multiple Presenters (See Database)';
 
             PresentedResearchProduction::create($presentedAttr);
+
+            $authorIds = $validated['presented']['author_ids'] ?? [];
+            if (!in_array(Auth::id(), $authorIds)) {
+                $authorIds[] = Auth::id();
+            }
+            $researchForm->coauthors()->sync($authorIds);
 
             $rating = $this->rating($points);
 

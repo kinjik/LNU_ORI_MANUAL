@@ -16,12 +16,14 @@ type AttendanceToResearchType = {
   attendance: ResearchAttendance;
   documents: Researchdocument[];
   status: string;
+  coauthors?: any[];
 };
 
 function AttendanceToResearch({
   attendance,
   documents,
   status,
+  coauthors,
 }: AttendanceToResearchType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -75,6 +77,26 @@ function AttendanceToResearch({
           <p className="pl-5 capitalize underline">
             {attendance.attendance_nature}
           </p>
+        </div>
+
+        <div>
+          <h2 className="font-semibold">Participant Name(s):</h2>
+          <div className="flex flex-wrap gap-2 mt-1 pl-5">
+            {coauthors && coauthors.length > 0 ? (
+              coauthors.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm italic text-gray-500">
+                No participants linked.
+              </span>
+            )}
+          </div>
         </div>
 
         <div>

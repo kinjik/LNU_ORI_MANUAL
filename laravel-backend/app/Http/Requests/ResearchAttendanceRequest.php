@@ -38,6 +38,8 @@ class ResearchAttendanceRequest extends FormRequest
             'participation.attendance_nature' => ['string', 'required'],
             'participation.fund_source_nature' => ['string', 'required'],
             'participation.conference_type' => ['string', 'required'],
+            'participation.author_ids' => ['required', 'array'],
+            'participation.author_ids.*' => ['integer', 'exists:users,id'],
             'participation.points' => ['required', 'numeric'],
         ];
     }

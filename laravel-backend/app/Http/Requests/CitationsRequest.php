@@ -30,7 +30,9 @@ class CitationsRequest extends FormRequest
             'agenda_mappings' => ['required', 'array'],
             'agenda_mappings.*' => ['integer'],
 
-            'citations.authors' => ['required', 'string'],
+            'citations.authors' => ['nullable', 'string'],
+            'citations.author_ids' => ['required', 'array'],
+            'citations.author_ids.*' => ['integer', 'exists:users,id'],
             'citations.cited_authors' => ['required', 'string'],
             'citations.cited_article_title' => ['required', 'string'],
             'citations.research_title' => ['required', 'string'],

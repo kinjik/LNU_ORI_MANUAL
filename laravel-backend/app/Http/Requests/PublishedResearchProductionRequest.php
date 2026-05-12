@@ -32,7 +32,9 @@ class PublishedResearchProductionRequest extends FormRequest
 
             'published.title' => 'required|string|max:255',
             'published.authorship_nature' => 'required|string|max:255',
-            'published.authors' => 'required|string',
+            'published.authors' => 'nullable|string',
+            'published.author_ids' => 'required|array',
+            'published.author_ids.*' => 'integer|exists:users,id',
             'published.research_field_id' => 'required|exists:research_fields,id',
             'published.research_type_id' => 'required|exists:research_types,id',
             'published.socio_economic_objective_id' => 'required|exists:socio_economic_objectives,id',

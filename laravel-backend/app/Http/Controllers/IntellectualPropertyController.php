@@ -95,11 +95,20 @@ class IntellectualPropertyController extends Controller
         'researchmonitoringform_id'
         ];
 
+        $ownerFallback = !empty($validated['intellectual']['owner_name']) ? $validated['intellectual']['owner_name'] : 'Multiple Creators (See Database)';
+        
         $intellectualAttr = array_intersect_key($validated['intellectual'], array_flip($intellectualFields));
-
+        
+        $intellectualAttr['owner_name'] = $ownerFallback;
         $intellectualAttr['researchmonitoringform_id'] = $researchForm->id;
 
         IntellectualProperty::create($intellectualAttr);
+
+        $authorIds = $validated['intellectual']['author_ids'] ?? [];
+        if (!in_array(Auth::id(), $authorIds)) {
+            $authorIds[] = Auth::id();
+        }
+        $researchForm->coauthors()->sync($authorIds);
 
         $rating = $this->rating($points);
 

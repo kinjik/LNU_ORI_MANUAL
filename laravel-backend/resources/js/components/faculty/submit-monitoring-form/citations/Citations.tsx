@@ -17,9 +17,10 @@ import { useAuthContextProvider } from "../../../../hooks/hooks"; // <-- IMPORTE
 import api from "../../../api/axios";
 import Button from "../../../shared/components/Button";
 import Tooltip from "../../../shared/components/Tooltip";
-import authorsArray from "../../../util/parseAuthors";
 import { FormData } from "../CreateResearchMonitoringForm";
 import { useCitationsPoints } from "../points/usePoints";
+import CoAuthorSelect from "../components/CoAuthorSelect";
+import { useFacultyList } from "../../../admin/monitoring-form/hooks/hook";
 
 type ResearchType = { type: string; id: number };
 type ResearchField = { field: string; id: number };
@@ -41,10 +42,9 @@ type CitationsProps = {
   clearError: UseFormClearErrors<FormData>;
 };
 
-async function checkScopus(authors: string, researchTitle: string) {
-  const arrayAuthors = authorsArray(authors);
+async function checkScopus(citedAuthors: string, researchTitle: string) {
   const res = await api.post("/api/check-scopus", {
-    authors: arrayAuthors,
+    authors: [citedAuthors], // Scopus expects an array of authors (cited authors in this case)
     research_title: researchTitle,
   });
   return res.data.data;
@@ -66,14 +66,32 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
   });
   const citedAuthors = useWatch({ name: "citations.cited_authors", control });
   const title = useWatch({ name: "citations.research_title", control });
-  const authors = useWatch({ name: "citations.authors", control });
+  const { field: authorIdsField } = useController({
+    name: "citations.author_ids",
+    control,
+  });
   const url = useWatch({ name: "citations.url_link", control });
   const scopusLink = useWatch({ name: "citations.scopus_link", control });
 
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+  useEffect(() => {
+    api.get("/api/user").then((res) => {
+      setCurrentUserId(res.data.id);
+      if (!authorIdsField.value?.includes(res.data.id)) {
+        authorIdsField.onChange([...(authorIdsField.value ?? []), res.data.id]);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data: facultyList = [] } = useFacultyList();
+  const selectedAuthorCount = (authorIdsField.value?.length ?? 1) || 1;
+
   const { points: citationsPoints, totalPoints } = useCitationsPoints(
     citedIsScopus,
-    authors,
+    "", // No longer using author string to split
     citedAuthors,
+    selectedAuthorCount,
   );
 
   useEffect(() => {
@@ -101,12 +119,7 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
     },
   });
 
-  // Automatically set the author to the logged-in user when the component loads
-  useEffect(() => {
-    if (user) {
-      setValue("citations.authors", `${user.fname} ${user.lname}`, { shouldValidate: true });
-    }
-  }, [user, setValue]);
+
 
   useEffect(() => {
     points.onChange(citationsPoints);
@@ -149,15 +162,15 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
           >
             Author(s)
           </label>
-          <input
-            id="authors"
-            className="h-9 rounded-md border border-gray-800 p-1 capitalize bg-gray-50"
-            {...register("citations.authors", {
-              required: "This field is required",
-            })}
+          <CoAuthorSelect
+            options={facultyList}
+            value={authorIdsField.value ?? []}
+            onChange={authorIdsField.onChange}
+            currentUserId={currentUserId}
+            label="Author(s)"
           />
           <p className="my-1.5 text-red-500">
-            {errors.citations?.authors?.message}
+            {errors.citations?.author_ids?.message}
           </p>
         </div>
         
@@ -188,11 +201,15 @@ const Citations = ({ register, errors, control, setValue }: CitationsProps) => {
           </label>
           <input
             id="editor"
+            list="editor-options"
             className="h-9 rounded-md border border-gray-800 p-1"
             {...register("citations.publisher_name", {
               required: "This field is required",
             })}
           />
+          <datalist id="editor-options">
+            <option value="Leyte Normal University (LNU)" />
+          </datalist>
           <p className="my-1.5 text-red-500">
             {errors.citations?.publisher_name?.message}
           </p>

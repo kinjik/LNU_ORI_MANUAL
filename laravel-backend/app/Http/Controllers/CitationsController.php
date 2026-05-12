@@ -100,10 +100,20 @@ class CitationsController extends Controller
                     'researchmonitoringform_id'
                 ];
 
+            $authorsFallback = !empty($validated['citations']['authors']) ? $validated['citations']['authors'] : 'Multiple Authors (See Database)';
+
             $citationsAttr = array_intersect_key($validated['citations'], array_flip($citationFields));
+            
+            $citationsAttr['authors'] = $authorsFallback;
             $citationsAttr['researchmonitoringform_id'] = $researchForm->id;
 
             Citation::create($citationsAttr);
+
+            $authorIds = $validated['citations']['author_ids'] ?? [];
+            if (!in_array(Auth::id(), $authorIds)) {
+                $authorIds[] = Auth::id();
+            }
+            $researchForm->coauthors()->sync($authorIds);
 
             $points = $validated['citations']['points'];
 

@@ -12,9 +12,10 @@ type CitationsDetailsType = {
   citations: CitationsType;
   status: string;
   documents: Researchdocument[];
+  coauthors?: any[];
 };
 
-function CitationsDetails({ citations, status, documents }: CitationsDetailsType) {
+function CitationsDetails({ citations, status, documents, coauthors }: CitationsDetailsType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -79,7 +80,22 @@ function CitationsDetails({ citations, status, documents }: CitationsDetailsType
         </div>
         <div>
           <h2 className="font-semibold">Authors</h2>
-          <p className="pl-5 capitalize underline">{citations.authors}</p>
+          <div className="flex flex-wrap gap-2 mt-1 pl-5">
+            {coauthors && coauthors.length > 0 ? (
+              coauthors.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm tracking-wide capitalize underline">
+                {citations.authors}
+              </span>
+            )}
+          </div>
         </div>
         <div>
           <p>Citation Details</p>

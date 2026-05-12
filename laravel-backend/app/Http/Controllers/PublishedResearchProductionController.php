@@ -85,10 +85,12 @@ class PublishedResearchProductionController extends Controller
 
                 ResearchDocument::insert($docs);
             }
+            $authorsFallback = !empty($request->safe()->published['authors']) ? $request->safe()->published['authors'] : 'Multiple Authors (See Database)';
+
             $researchAttr = [
                 'title' => $request->safe()->published['title'],
                 'authorship_nature' => $request->safe()->published['authorship_nature'],
-                'authors' => $request->safe()->published['authors'],
+                'authors' => $authorsFallback,
                 'research_field_id' => $request->safe()->published['research_field_id'],
                 'research_type_id' => $request->safe()->published['research_type_id'],
                 'socio_economic_objective_id' => $request->safe()->published['socio_economic_objective_id'],
@@ -96,6 +98,12 @@ class PublishedResearchProductionController extends Controller
             ];
 
             $research = Research::create($researchAttr);
+
+            $authorIds = $request->published['author_ids'] ?? [];
+            if (!in_array(Auth::id(), $authorIds)) {
+                $authorIds[] = Auth::id();
+            }
+            $researchForm->coauthors()->sync($authorIds);
 
             $publishedAttr = [
                 'date' => $request->safe()->published['date'],

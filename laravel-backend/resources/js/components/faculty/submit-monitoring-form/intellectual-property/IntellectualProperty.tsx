@@ -11,6 +11,10 @@ import { FormData } from "../CreateResearchMonitoringForm";
 import { CiCircleQuestion } from "react-icons/ci";
 import Tooltip from "../../../shared/components/Tooltip";
 import { useGetIntellectualPropertyPoints } from "../points/usePoints";
+import CoAuthorSelect from "../components/CoAuthorSelect";
+import { useFacultyList } from "../../../admin/monitoring-form/hooks/hook";
+import { useState } from "react";
+import api from "../../../api/axios";
 
 type IntellectualPropertyProps = {
   register: UseFormRegister<FormData>;
@@ -27,6 +31,25 @@ const IntellectualProperty = ({
     name: "intellectual.points",
     control,
   });
+
+  const { field: authorIdsField } = useController({
+    name: "intellectual.author_ids",
+    control,
+  });
+
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+  useEffect(() => {
+    api.get("/api/user").then((res) => {
+      setCurrentUserId(res.data.id);
+      if (!authorIdsField.value?.includes(res.data.id)) {
+        authorIdsField.onChange([...(authorIdsField.value ?? []), res.data.id]);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data: facultyList = [] } = useFacultyList();
+  const selectedAuthorCount = (authorIdsField.value?.length ?? 1) || 1;
 
   const type = useWatch({ name: "intellectual.property_type", control });
   
@@ -54,6 +77,7 @@ const IntellectualProperty = ({
       grant_date: grantDate,
       publication_date: publicationDate,
       isLNU: isLNUProcessed,
+      authorCount: selectedAuthorCount,
     });
 
   const getPointsMessage = (
@@ -198,17 +222,17 @@ const IntellectualProperty = ({
             className="font-semibold after:ms-1 after:text-red-500 after:content-['*']"
             htmlFor="owner"
           >
-            Owner of Intellectual Property
+            Inventor/Creator Name(s)
           </label>
-          <input
-            id="owner"
-            className="h-9 cursor-pointer rounded-md border border-gray-800 p-1"
-            {...register("intellectual.owner_name", {
-              required: "This field is required.",
-            })}
+          <CoAuthorSelect
+            options={facultyList}
+            value={authorIdsField.value ?? []}
+            onChange={authorIdsField.onChange}
+            currentUserId={currentUserId}
+            label="Inventor/Creator Name(s)"
           />
           <p className="my-1.5 text-red-500">
-            {errors.intellectual?.owner_name?.message}
+            {errors.intellectual?.author_ids?.message}
           </p>
         </div>
         <div className="flex flex-col gap-2">
@@ -220,9 +244,13 @@ const IntellectualProperty = ({
           </label>
           <input
             id="org"
+            list="org-options"
             className="h-9 cursor-pointer rounded-md border border-gray-800 p-1"
             {...register("intellectual.processor_name", { required: "This field is required." })}
           />
+          <datalist id="org-options">
+            <option value="Leyte Normal University (LNU)" />
+          </datalist>
           <p className="my-1.5 text-red-500">
             {errors.intellectual?.processor_name?.message}
           </p>

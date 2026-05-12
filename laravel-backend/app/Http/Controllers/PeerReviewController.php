@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class PeerReviewController extends Controller
 {
@@ -101,6 +102,12 @@ class PeerReviewController extends Controller
             $peerReviewAttr['researchmonitoringform_id'] = $researchForm->id;
 
             PeerReview::create($peerReviewAttr);
+
+            $authorIds = $validated['peerjournal']['author_ids'] ?? [];
+            if (!in_array(Auth::id(), $authorIds)) {
+                $authorIds[] = Auth::id();
+            }
+            $researchForm->coauthors()->sync($authorIds);
 
             $rating = $this->rating($points);
 

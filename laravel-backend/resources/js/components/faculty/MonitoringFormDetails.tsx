@@ -106,6 +106,7 @@ const MonitoringFormDetails = () => {
             attendance={data.attendancetoresearch}
             documents={data.researchdocuments}
             status={data.status}
+            coauthors={data?.coauthors}
           />
         )}
         {data?.presentedresearchprod && (
@@ -113,6 +114,7 @@ const MonitoringFormDetails = () => {
             status={data.status}
             presented={data.presentedresearchprod}
             documents={data.researchdocuments}
+            coauthors={data?.coauthors}
           />
         )}
 
@@ -129,6 +131,7 @@ const MonitoringFormDetails = () => {
             status={data.status}
             citations={data.citations}
             documents={data.researchdocuments}
+            coauthors={data?.coauthors}
           />
         )}
         {data?.intellectualproperty && (
@@ -136,6 +139,7 @@ const MonitoringFormDetails = () => {
             documents={data.researchdocuments}
             status={data.status}
             intellectualproperty={data.intellectualproperty}
+            coauthors={data?.coauthors}
           />
         )}
         {data?.peerreview && (
@@ -143,6 +147,7 @@ const MonitoringFormDetails = () => {
             documents={data.researchdocuments}
             peerreview={data.peerreview}
             status={data.status}
+            coauthors={data?.coauthors}
           />
         )}
         {data?.publishedresearchprod && (
@@ -150,6 +155,7 @@ const MonitoringFormDetails = () => {
             documents={data.researchdocuments}
             status={data.status}
             published={data.publishedresearchprod}
+            coauthors={data?.coauthors}
           />
         )}
       </div>

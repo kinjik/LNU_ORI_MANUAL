@@ -40,6 +40,11 @@ export type FormData = {
   intellectual: IntellectualPropertyType & { points: number; author_ids: number[] };
   peerjournal: PeerReviewType & { points: number; author_ids: number[] };
   otherresearch: OtherResearchType & { points: number };
+  generic: {
+    dynamic_data: Record<string, any>;
+    author_ids: number[];
+    points: number;
+  };
 };
 
 export type PayloadType = {
@@ -171,6 +176,11 @@ const CreateResearchMonitoringForm = () => {
         date: "",
         points: 0,
       },
+      generic: {
+        dynamic_data: {},
+        author_ids: [],
+        points: 0,
+      },
     },
   });
 
@@ -230,8 +240,19 @@ const CreateResearchMonitoringForm = () => {
       8: "otherresearch",
     } as const;
 
-    const fieldKey =
-      validTypes[involvementTypeSelected as keyof typeof validTypes];
+    // For custom types (is_custom=true), look up the selected type from the fetched list
+    const selectedTypeObj = involvementTypes?.find(
+      (t) => t.id === involvementTypeSelected,
+    );
+    const isCustomType =
+      selectedTypeObj?.is_custom === true ||
+      !(involvementTypeSelected in validTypes);
+
+    const fieldKey = isCustomType
+      ? ("generic-research" as const)
+      : validTypes[involvementTypeSelected as keyof typeof validTypes];
+
+    const payloadKey = isCustomType ? "generic" : fieldKey;
 
     if (fileList.length === 0) {
       setError("research_documents", {
@@ -248,7 +269,7 @@ const CreateResearchMonitoringForm = () => {
         research_documents: data.research_documents,
         sdg_mappings: data.sdg_mappings,
         agenda_mappings: data.agenda_mappings,
-        ...(fieldKey && { [fieldKey]: data[fieldKey] }),
+        ...(payloadKey && { [payloadKey]: data[payloadKey as keyof FormData] }),
       };
 
       setSubmitLoading(true);

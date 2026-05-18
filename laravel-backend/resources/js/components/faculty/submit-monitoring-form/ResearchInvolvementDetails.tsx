@@ -17,6 +17,7 @@ import Citations from "./citations/Citations";
 import ParticipationResearch from "./participation-research/ParticipationResearch";
 import IntellectualProperty from "./intellectual-property/IntellectualProperty";
 import PeerReview from "./peer-review/PeerReview";
+import GenericResearch from "./generic-research/GenericResearch";
 
 type ResearchInvolvementDetailsProps = {
   involvementType: number;
@@ -91,7 +92,17 @@ const ResearchInvolvementDetails = ({
           register={register}
         />
       ) : (
-        <h1>No matching research involvement type</h1>
+        // Fallback for any custom/admin-created type
+        <GenericResearch
+          clearError={clearError}
+          setError={setError}
+          setValue={setValue}
+          control={control}
+          researchDetails={researchDetails}
+          errors={errors}
+          register={register}
+          involvementType={involvementType}
+        />
       )}
     </section>
   );

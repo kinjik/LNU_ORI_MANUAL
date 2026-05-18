@@ -10,6 +10,7 @@ import ParticipationToResearch from "./ParticipationToResearch";
 import CitationsForm from "./CitationsForm";
 import PeerReviewForm from "./PeerReviewForm";
 import OtherResearchForm from "./OtherResearchForm";
+import GenericResearchForm from "./GenericResearchForm";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const AdminMonitoringFormDetails = () => {
@@ -151,6 +152,17 @@ const AdminMonitoringFormDetails = () => {
             formStatus={data.status}
             otherresearch={data.otherresearch}
             points={data.points.points}
+          />
+        )}
+
+        {data?.genericresearchprod && (
+          <GenericResearchForm
+            generic={data.genericresearchprod}
+            formSchema={data.researchinvolvement.form_schema || []}
+            formStatus={data.status}
+            points={data.points.points}
+            documents={data.researchdocuments}
+            coauthors={data.coauthors}
           />
         )}
       </div>

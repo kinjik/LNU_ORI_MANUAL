@@ -5,22 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-class ResearchInvolvementType extends Model
+
+class GenericResearchProduction extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'research_involvement_type',
-        'enable',
-        'is_custom',
-        'default_points',
-        'form_schema',
+        'dynamic_data',
+        'collaborators',
+        'researchmonitoringform_id',
     ];
 
     protected $casts = [
-        'form_schema' => 'array',
-        'is_custom' => 'boolean',
-        'enable' => 'boolean',
+        'dynamic_data' => 'array',
     ];
 
     public function researchmonitoringform(): BelongsTo

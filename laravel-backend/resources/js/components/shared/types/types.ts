@@ -81,6 +81,11 @@ export type MonitoringFormDetailsType = {
   otherresearch: OtherResearchType;
   peerreview: PeerReviewType;
   intellectualproperty: IntellectualPropertyType;
+  genericresearchprod: {
+    id: number;
+    researchmonitoringform_id: number;
+    dynamic_data: Record<string, any>;
+  };
   researchdocuments: Researchdocument[];
   points: Points;
   coauthors?: any[];
@@ -147,10 +152,19 @@ export type BackupFilesType = {
   created_at: Date;
 };
 
+export type FormSchemaField = {
+  id: string;
+  label: string;
+  type: "text" | "date" | "number";
+};
+
 export type ResearchInvolvementType = {
   id: number;
   research_involvement_type: string;
   enable: boolean;
+  is_custom: boolean;
+  default_points: number | null;
+  form_schema: FormSchemaField[] | null;
 };
 
 export type Researchdocument = {

@@ -9,6 +9,7 @@ import IntellectualPropertyDetails from "./components/ResearchFormDetails/Intell
 import CitationsDetails from "./components/ResearchFormDetails/CitationsDetails";
 import PublishedResearchDetails from "./components/ResearchFormDetails/PublishedResesarchDetails";
 import PeerReviewForm from "./components/ResearchFormDetails/PeerReviewForm";
+import GenericResearchDetails from "./components/ResearchFormDetails/GenericResearchDetails";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 
@@ -155,6 +156,15 @@ const MonitoringFormDetails = () => {
             documents={data.researchdocuments}
             status={data.status}
             published={data.publishedresearchprod}
+            coauthors={data?.coauthors}
+          />
+        )}
+        {data?.genericresearchprod && (
+          <GenericResearchDetails
+            status={data.status}
+            documents={data.researchdocuments}
+            generic={data.genericresearchprod}
+            formSchema={data.researchinvolvement.form_schema || []}
             coauthors={data?.coauthors}
           />
         )}

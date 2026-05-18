@@ -13,8 +13,8 @@ interface MobileMenuProps {
 
 const MobileMenu = ({ openMenu, toggleMenu }: MobileMenuProps) => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  const { user } = useAuthContextProvider();
-  const roleName = user?.roles?.[0]?.name;
+  const { user, activeRole } = useAuthContextProvider();
+  const roleName = activeRole || user?.roles?.[0]?.name;
   const isAdmin = roleName === RoleEnum.ADMIN;
   const isCoordinator = roleName === RoleEnum.RESEARCH_COORDINATOR;
   const isFaculty = roleName === RoleEnum.FACULTY;

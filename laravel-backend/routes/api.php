@@ -45,6 +45,7 @@ use App\Http\Controllers\ScopusJournalCheckerController;
 use App\Http\Controllers\SystemBackupController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UtilityPatentCopywriteController;
+use App\Http\Controllers\Admin\ResearchInvolvementTypeController;
 use Symfony\Component\Process\Process;
 
 Route::get('/test-sqlite', function () {
@@ -184,6 +185,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 
     Route::get('/research-involvement-types', [ResearchMonitoringFormController::class, 'researchInvolvementTypes']);
+    // Admin CRUD for custom types
+    Route::get('/admin/research-involvement-types', [ResearchInvolvementTypeController::class, 'index'])->middleware('role:admin');
+    Route::post('/admin/research-involvement-types', [ResearchInvolvementTypeController::class, 'store'])->middleware('role:admin');
+    Route::put('/admin/research-involvement-types/{researchInvolvementType}', [ResearchInvolvementTypeController::class, 'update'])->middleware('role:admin');
+    Route::delete('/admin/research-involvement-types/{researchInvolvementType}', [ResearchInvolvementTypeController::class, 'destroy'])->middleware('role:admin');
 
     //research monitoring form
     Route::get('/research-monitoring-forms', [ResearchMonitoringFormController::class, 'index']);
@@ -303,6 +309,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         ->middleware('can:update,presented');
 
     Route::delete('/presented/{presented}', [PresentedResearchProductionController::class, 'destroy'])->middleware('permission:research-monitoring-form-delete');
+
+    Route::post('/generic-research', [\App\Http\Controllers\GenericResearchController::class, 'store'])->middleware('permission:research-monitoring-form-store');
 
     Route::get('/published', [PublishedResearchProductionController::class, 'index'])->middleware('permission:research-monitoring-form-index');
     Route::get('/published/{published}', [PublishedResearchProductionController::class, 'show'])->middleware('can:view,published');

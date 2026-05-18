@@ -145,6 +145,11 @@ class ResearchMonitoringForm extends Model
         return $this->hasOne(CreativeWorksDesign::class);
     }
 
+    public function genericresearchprod(): HasOne
+    {
+        return $this->hasOne(GenericResearchProduction::class, 'researchmonitoringform_id');
+    }
+
     public function points(): HasOne
     {
         return $this->hasOne(Point::class, 'researchmonitoringform_id');

@@ -10,6 +10,7 @@ import PeerReviewForm from "./components/PeerReviewForm";
 import PublishedResearchForm from "./components/PublishedResearchForm";
 import CitationsForm from "./components/CitationsForm";
 import OtherResearchForm from "./components/OtherResearchForm";
+import GenericResearchForm from "./components/GenericResearchForm";
 
 const getImageUrl = (path: string | null | undefined) => {
   if (!path) return "https://via.placeholder.com/150";
@@ -151,6 +152,17 @@ const MonitoringForm = () => {
                 documents={data.researchdocuments}
                 formStatus={data.status}
                 otherresearch={data.otherresearch}
+              />
+            )}
+
+            {data?.genericresearchprod && (
+              <GenericResearchForm
+                generic={data.genericresearchprod}
+                formSchema={data.researchinvolvement.form_schema || []}
+                documents={data.researchdocuments}
+                formStatus={data.status}
+                rejected_message={data.rejected_message ?? null}
+                coauthors={data.coauthors}
               />
             )}
           </div>

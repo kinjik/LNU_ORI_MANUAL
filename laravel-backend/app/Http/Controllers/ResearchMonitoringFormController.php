@@ -131,8 +131,7 @@ class ResearchMonitoringFormController extends Controller
     }
     public function researchInvolvementTypes()
     {
-        $data = ResearchInvolvementType::where('enable', true)->select('id', 'research_involvement_type')
-            ->get();
+        $data = ResearchInvolvementType::where('enable', true)->get();
 
         return $this->success($data, "Showing Research Involvement Types");
     }
@@ -168,7 +167,8 @@ class ResearchMonitoringFormController extends Controller
                 break;
 
             default:
-                return $this->error('', 'Involvement Type not found', 500);
+                $data = $researchMonitoringForm->fresh('genericresearchprod', 'researchinvolvement:id,research_involvement_type,form_schema,default_points', 'users', 'researchdocuments', 'points:id,points,rating,researchmonitoringform_id', 'sdgMappings', 'agendaMappings', 'coauthors');
+                break;
         }
 
         return $this->success($data, 'Research Monitoring Form retrieved succesfully');

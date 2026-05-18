@@ -29,7 +29,8 @@ type CreateResearchMonitoringForm = {
     | "participation"
     | "intellectual"
     | "peerjournal"
-    | "otherresearch";
+    | "otherresearch"
+    | "generic-research";
 };
 
 export type BarChartType = {

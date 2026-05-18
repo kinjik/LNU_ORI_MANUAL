@@ -52,6 +52,7 @@ import ArchivedResearch from "./components/admin/monitoring-form/ArchivedResearc
 import ArchivedSubmissions from "./components/faculty/submit-monitoring-form/ArchivedSubmissions";
 import Backup from "./components/admin/settings/Backup";
 import ResearchInvolvementTypeManager from "./components/admin/settings/ResearchInvolvementTypeManager";
+import GlobalSettings from "./components/admin/settings/GlobalSettings";
 import Register from "./pages/Register";
 
 const router = createBrowserRouter([
@@ -236,7 +237,10 @@ const router = createBrowserRouter([
             path: "research-types",
             element: <ResearchInvolvementTypeManager />,
           },
-
+          {
+            path: "global-settings",
+            element: <GlobalSettings />,
+          },
         ],
       },
     ],

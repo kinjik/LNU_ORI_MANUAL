@@ -261,12 +261,31 @@ class AdminController extends Controller
         $endDate = $request->query("endDate");
 
         $user->load(["researchmonitoringform" => function ($query) use ($startDate, $endDate) {
-            $query->where('status', ResearchMonitoringFormStatus::EVALUATED)
+            $query->whereIn('status', [ResearchMonitoringFormStatus::EVALUATED, ResearchMonitoringFormStatus::APPROVED])
                 ->whereBetween("created_at", [$startDate, $endDate])
                 ->with(["researchinvolvement:id,research_involvement_type", "points:researchmonitoringform_id,points,id"]);
         }]);
 
         $user['name'] = $user->getFullName();
+
+        // Calculate total points
+        $totalPoints = $user->researchmonitoringform->sum(function ($form) {
+            return $form->points ? $form->points->points : 0;
+        });
+        $user['total_points'] = $totalPoints;
+
+        // Fetch coordinator
+        $coordinator = User::role(RoleEnum::RESEARCH_COORDINATOR)
+            ->where('college', $user->college)
+            ->first();
+        $user['coordinator_name'] = $coordinator ? $coordinator->getFullName() : 'Unknown Coordinator';
+
+        // Fetch SystemSettings
+        $execDirector = \App\Models\SystemSetting::where('key', 'signatory_executive_director')->first();
+        $vicePresident = \App\Models\SystemSetting::where('key', 'signatory_vice_president')->first();
+
+        $user['signatory_executive_director'] = $execDirector ? $execDirector->value : '';
+        $user['signatory_vice_president'] = $vicePresident ? $vicePresident->value : '';
 
         return $this->success($user);
     }

@@ -46,6 +46,7 @@ use App\Http\Controllers\SystemBackupController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UtilityPatentCopywriteController;
 use App\Http\Controllers\Admin\ResearchInvolvementTypeController;
+use App\Http\Controllers\Admin\SystemSettingController;
 use Symfony\Component\Process\Process;
 
 Route::get('/test-sqlite', function () {
@@ -190,6 +191,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/admin/research-involvement-types', [ResearchInvolvementTypeController::class, 'store'])->middleware('role:admin');
     Route::put('/admin/research-involvement-types/{researchInvolvementType}', [ResearchInvolvementTypeController::class, 'update'])->middleware('role:admin');
     Route::delete('/admin/research-involvement-types/{researchInvolvementType}', [ResearchInvolvementTypeController::class, 'destroy'])->middleware('role:admin');
+
+    // Admin System Settings
+    Route::get('/admin/system-settings', [SystemSettingController::class, 'index'])->middleware('role:admin');
+    Route::put('/admin/system-settings', [SystemSettingController::class, 'update'])->middleware('role:admin');
 
     //research monitoring form
     Route::get('/research-monitoring-forms', [ResearchMonitoringFormController::class, 'index']);

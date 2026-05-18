@@ -58,6 +58,10 @@ const Reports = () => {
       college: report.college,
       startDate: form.startDate?.toString() || "",
       endDate: form.endDate?.toString() || "",
+      total_points: report.total_points || 0,
+      coordinator_name: report.coordinator_name || "",
+      signatory_executive_director: report.signatory_executive_director || "",
+      signatory_vice_president: report.signatory_vice_president || "",
       researchInvolvement: report.researchmonitoringform.map(
         (item: {
           researchinvolvement: { research_involvement_type: string };

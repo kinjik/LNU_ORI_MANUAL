@@ -10,6 +10,7 @@ const navList = [
   { id: 6, name: "Awards Management", url: "/admin-settings/awards" },
   { id: 7, name: "Backup and Restore", url: "/admin-settings/backup" },
   { id: 8, name: "Research Types", url: "/admin-settings/research-types" },
+  { id: 9, name: "Global Settings", url: "/admin-settings/global-settings" },
 ];
 
 export default function Settings() {

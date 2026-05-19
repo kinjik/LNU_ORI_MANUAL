@@ -33,6 +33,8 @@ export default {
     extend: {
       fontFamily: {
         inter: ["Inter", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
+        "open-sans": ["Open Sans", "sans-serif"],
       },
       keyframes: {
         loading: {

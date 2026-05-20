@@ -195,6 +195,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Admin System Settings
     Route::get('/admin/system-settings', [SystemSettingController::class, 'index'])->middleware('role:admin');
     Route::put('/admin/system-settings', [SystemSettingController::class, 'update'])->middleware('role:admin');
+    Route::post('/admin/system-settings/upload-header-image', [SystemSettingController::class, 'uploadHeaderImage'])->middleware('role:admin');
+    Route::delete('/admin/system-settings/header-image', [SystemSettingController::class, 'deleteHeaderImage'])->middleware('role:admin');
 
     //research monitoring form
     Route::get('/research-monitoring-forms', [ResearchMonitoringFormController::class, 'index']);

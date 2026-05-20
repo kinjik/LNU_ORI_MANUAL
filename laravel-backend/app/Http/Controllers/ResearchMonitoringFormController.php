@@ -187,16 +187,19 @@ class ResearchMonitoringFormController extends Controller
         if ($request->status[0] === ResearchMonitoringFormStatus::RESUBMISSION->value) {
             $isResubmission = true;
         } else {
-            if (count($documents) < 1 && $request->status[0] === DocumentStatus::REJECTED->value) {
+            $statusArray = $request->status;
+            $singleStatus = count($statusArray) === 1;
+
+            if (!$singleStatus && count($documents) < 1 && $statusArray[0] === DocumentStatus::REJECTED->value) {
                 $isRejected = true;
             } else {
                 foreach ($documents as $index => $document) {
-                    $doc = $request->status[$index];
+                    $doc = isset($statusArray[$index]) ? $statusArray[$index] : $statusArray[0];
                     $document->update(['status' => $doc]);
                     if ($doc == DocumentStatus::REJECTED->value) {
                         $isRejected = true;
                     }
-                };
+                }
             }
         }
 
@@ -223,6 +226,7 @@ class ResearchMonitoringFormController extends Controller
                 'status'      => ResearchMonitoringFormStatus::APPROVED,
                 'reviewed_by' => $user->getFullName(),
                 'reviewed_at' => now()->format('m/d/Y h:i a'),
+                'rejected_message' => null,
             ]);
 
             $status = ResearchMonitoringFormStatus::APPROVED->value;
@@ -259,7 +263,11 @@ class ResearchMonitoringFormController extends Controller
             $status = ResearchMonitoringFormStatus::REJECTED->value;
         } else {
 
-            $form->update(['status' => ResearchMonitoringFormStatus::EVALUATED, 'evaluated_at' => now()->format('m/d/Y h:i a')]);
+            $form->update([
+                'status' => ResearchMonitoringFormStatus::EVALUATED, 
+                'evaluated_at' => now()->format('m/d/Y h:i a'),
+                'rejected_message' => null,
+            ]);
 
             $status = ResearchMonitoringFormStatus::EVALUATED->value;
         }

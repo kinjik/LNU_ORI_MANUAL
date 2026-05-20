@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import pdfThumbnail from "../../../assets/images/pngwing.com.png";
 import RejectedModalMessage from "../../admin/monitoring-form/monitoring-forms/RejectedModalMessage";
 import ConfirmationModal from "../../shared/components/ConfirmationModal";
@@ -55,15 +56,32 @@ const GenericResearchForm = ({
     setOpenModal(false);
     setOpenRejectedModal(false);
 
+    const isApproving = status.current[0] === STATUS_TYPE.APPROVED;
+    const isRejecting = status.current[0] === STATUS_TYPE.REJECT;
+
     const variables: UpdateMonitoringFormVariables = {
       id: generic.researchmonitoringform_id,
       status: status.current,
       isAdmin: false,
       rejected_message: message,
     };
-    await updateMonitoringForm(variables);
-    refetchData();
-    navigate("/coordinator-dashboard");
+
+    try {
+      await updateMonitoringForm(variables);
+      refetchData();
+
+      if (isApproving) {
+        toast.success("Form successfully approved!");
+      } else if (isRejecting) {
+        toast.success("Form rejected.");
+      } else {
+        toast.success("Form status updated.");
+      }
+
+      navigate("/coordinator-dashboard");
+    } catch {
+      toast.error("Failed to process evaluation. Please try again.");
+    }
   };
 
   const handleResubmission = async () => {
@@ -74,9 +92,15 @@ const GenericResearchForm = ({
       isAdmin: false,
       rejected_message: resubmissionMessage,
     };
-    await updateMonitoringForm(variables);
-    refetchData();
-    navigate("/coordinator-dashboard");
+
+    try {
+      await updateMonitoringForm(variables);
+      refetchData();
+      toast.success("Form returned for resubmission.");
+      navigate("/coordinator-dashboard");
+    } catch {
+      toast.error("Failed to process evaluation. Please try again.");
+    }
   };
 
   if (error)

@@ -62,6 +62,7 @@ const Reports = () => {
       coordinator_name: report.coordinator_name || "",
       signatory_executive_director: report.signatory_executive_director || "",
       signatory_vice_president: report.signatory_vice_president || "",
+      report_header_image: report.report_header_image || null,
       researchInvolvement: report.researchmonitoringform.map(
         (item: {
           researchinvolvement: { research_involvement_type: string };

@@ -15,6 +15,7 @@ export interface NotificationType {
   created_at: string | Date;
   image_path?: string;
   read_at: string | null;
+  intended_role?: string;
 }
 
 interface HeaderProps {
@@ -37,7 +38,7 @@ const getImageUrl = (path: string | null | undefined) => {
 };
 
 const Header = ({ toggleMenu, openMenu }: HeaderProps) => {
-  const { user } = useAuthContextProvider();
+  const { user, activeRole } = useAuthContextProvider();
   const [profileColor, setProfileColor] = useState("bg-blue-500");
   const [openNotification, setOpenNotification] = useState(false);
   const [pageTitle, setPageTitle] = useState("");
@@ -46,7 +47,11 @@ const Header = ({ toggleMenu, openMenu }: HeaderProps) => {
   const { notifications, setNotifications, deleteNotification, markAsRead } =
     useNotifications();
 
-  const isUnreadNotif = notifications.some((notif) => notif.read_at == null);
+  const filteredNotifications = notifications.filter(
+    (notif) => !notif.intended_role || notif.intended_role === activeRole
+  );
+
+  const isUnreadNotif = filteredNotifications.some((notif) => notif.read_at == null);
 
   useEffect(() => {
     echo
@@ -195,6 +200,7 @@ const Header = ({ toggleMenu, openMenu }: HeaderProps) => {
                 markAsRead={markAsRead}
                 setNotifications={setNotifications}
                 notifications={notifications}
+                activeRole={activeRole || ""}
                 onClose={onClose}
               />
             )}

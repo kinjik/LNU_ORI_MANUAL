@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
 
-  // ── Header ──────────────────────────────────────────────────────────────
+  // ── Header ────────────────────────────────────────────────────────────────
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -33,13 +33,20 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1.5,
     borderBottomColor: BLACK,
+    // Hard cap the entire header block so no image can overflow
+    maxHeight: 80,
+    overflow: "hidden",
   },
   reportHeader: {
     flex: 1,
+    maxHeight: 70,
+    objectFit: "contain",
   },
   oriLogo: {
-    width: 90,
-    marginLeft: 12,
+    width: 70,
+    maxHeight: 70,
+    marginLeft: 10,
+    objectFit: "contain",
   },
 
   // ── Title Block ─────────────────────────────────────────────────────────
@@ -241,6 +248,7 @@ export type FPESReportProps = {
     coordinator_name: string;
     signatory_executive_director: string;
     signatory_vice_president: string;
+    report_header_image: string | null;
     researchInvolvement: {
       involvement: string;
       points: number;
@@ -265,6 +273,8 @@ const SignatoryName = ({ name }: { name: string }) =>
 // ─── Component ────────────────────────────────────────────────────────────────
 const FPESReport = ({ data }: FPESReportProps) => {
   const totalPoints = data.total_points || 0;
+  // Use admin-uploaded header if available, otherwise fall back to the static asset
+  const headerSrc: string = data.report_header_image || (reportHeader as unknown as string);
 
   return (
     <Document>
@@ -272,8 +282,8 @@ const FPESReport = ({ data }: FPESReportProps) => {
 
         {/* ── Header ───────────────────────────────────────────────────── */}
         <View style={styles.headerRow}>
-          <Image src={reportHeader} style={styles.reportHeader} />
-          <Image src={oriBlack} style={styles.oriLogo} />
+          <Image src={headerSrc} style={styles.reportHeader} />
+          <Image src={oriBlack as unknown as string} style={styles.oriLogo} />
         </View>
 
         {/* ── Title ────────────────────────────────────────────────────── */}

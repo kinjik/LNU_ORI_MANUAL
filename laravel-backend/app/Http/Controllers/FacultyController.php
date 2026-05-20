@@ -68,14 +68,31 @@ class FacultyController extends Controller
         $awards = AwardsManagement::get();
 
         foreach ($awards as $index => $award) {
+            $remainingPoints = $award->min_range_points - $totalPoints;
+            $notifiedKey = 'points-notified-' . $award->id;
 
-            if ($totalPoints > ((70 / 100) * $award->min_range_points) && $totalPoints < $award->max_range_points && !Session::has('points-notified')) {
+            $isInRange = ($totalPoints > ((70 / 100) * $award->min_range_points)) 
+                && ($award->max_range_points === null || $totalPoints < $award->max_range_points);
 
-                    $user->notify(new PointsNotification("Keep Going! You're just " . ($award->min_range_points - $totalPoints) . " points away from reaching the " . Number::ordinal($index + 1) . " special citation award! Keep submitting your research involvement and earn more points!", '/create/research-monitoring-form', '', ''));
-
-                    Session::put('points-notified', true);
+            if ($isInRange && !Session::has($notifiedKey)) {
+                if ($remainingPoints <= 0) {
+                    $user->notify(new PointsNotification(
+                        "Congratulations! You have reached the " . Number::ordinal($index + 1) . " special citation award by earning " . $totalPoints . " points!",
+                        '/faculty/dashboard',
+                        '',
+                        ''
+                    ));
+                } else {
+                    $user->notify(new PointsNotification(
+                        "Keep Going! You're just " . $remainingPoints . " points away from reaching the " . Number::ordinal($index + 1) . " special citation award! Keep submitting your research involvement and earn more points!",
+                        '/create/research-monitoring-form',
+                        '',
+                        ''
+                    ));
                 }
+                Session::put($notifiedKey, true);
             }
+        }
 
         // Forms where the logged-in faculty was tagged as a co-author (but is not the primary owner)
         $sharedForms = ResearchMonitoringForm::whereHas('coauthors', function ($q) use ($user) {

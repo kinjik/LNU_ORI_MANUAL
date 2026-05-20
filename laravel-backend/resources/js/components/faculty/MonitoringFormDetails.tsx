@@ -83,7 +83,7 @@ const MonitoringFormDetails = () => {
 
           <Badge type={data?.status} />
         </div>
-                {data?.rejected_message && (
+        {data?.rejected_message && (data.status === STATUS_TYPE.REJECT || data.status === STATUS_TYPE.RESUBMISSION) && (
           <div className={`mb-6 rounded-md border-l-4 p-4 w-full ${data.status === 'resubmission' ? 'border-orange-500 bg-orange-50' : 'border-red-500 bg-red-50'}`}>
             <div className="flex">
               <div className="flex-shrink-0">

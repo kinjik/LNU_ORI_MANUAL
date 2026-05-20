@@ -96,19 +96,33 @@ const SdgAgenda = ({ control, sdgAgenda }: SDGAgendaProps) => {
         title="Select the best Sustainable Development Growth"
       >
         {sdg && sdg.length > 0 ? (
-          <div className="grid grid-cols-4 gap-5">
-            {sdg.map((card) => (
-              <Card
-                key={card.id}
-                onClick={() => handleModalCardClick(card.id, true, false)}
-                card={card}
-                className={`cursor-pointer p-3 ${
-                  sdgField.value.some((s) => s === card.id)
-                    ? "border-blue-500"
-                    : "border-gray-500"
-                }`}
-              />
-            ))}
+          <div className="flex flex-col gap-6"> {/* <-- Added wrapper */}
+            <div className="grid grid-cols-4 gap-5">
+              {sdg.map((card) => (
+                <Card
+                  key={card.id}
+                  onClick={() => handleModalCardClick(card.id, true, false)}
+                  card={card}
+                  className={`cursor-pointer p-3 ${
+                    sdgField.value.some((s) => s === card.id)
+                      ? "border-blue-500"
+                      : "border-gray-500"
+                  }`}
+                />
+              ))}
+            </div>
+            
+            {/* --- NEW PROCEED BUTTON --- */}
+            <div className="flex w-full justify-end border-t border-gray-200 pt-4">
+              <button
+                onClick={() => setModalOpen({ sdg: false, agenda: false })}
+                className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                Proceed
+              </button>
+            </div>
+            {/* --------------------------- */}
+            
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-3 py-16 text-gray-400">
@@ -146,19 +160,33 @@ const SdgAgenda = ({ control, sdgAgenda }: SDGAgendaProps) => {
         title="Select the best Agenda"
       >
         {agenda && agenda.length > 0 ? (
-          <div className="grid grid-cols-4 gap-5">
-            {agenda.map((card) => (
-              <Card
-                key={card.id}
-                onClick={() => handleModalCardClick(card.id, false, true)}
-                card={card}
-                className={`cursor-pointer p-3 ${
-                  agendaField.value.some((a) => a === card.id)
-                    ? "border-blue-500"
-                    : "border-gray-500"
-                }`}
-              />
-            ))}
+          <div className="flex flex-col gap-6"> {/* <-- Added wrapper */}
+            <div className="grid grid-cols-4 gap-5">
+              {agenda.map((card) => (
+                <Card
+                  key={card.id}
+                  onClick={() => handleModalCardClick(card.id, false, true)}
+                  card={card}
+                  className={`cursor-pointer p-3 ${
+                    agendaField.value.some((a) => a === card.id)
+                      ? "border-blue-500"
+                      : "border-gray-500"
+                  }`}
+                />
+              ))}
+            </div>
+            
+            {/* --- NEW PROCEED BUTTON --- */}
+            <div className="flex w-full justify-end border-t border-gray-200 pt-4">
+              <button
+                onClick={() => setModalOpen({ sdg: false, agenda: false })}
+                className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                Proceed
+              </button>
+            </div>
+            {/* --------------------------- */}
+
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-3 py-16 text-gray-400">

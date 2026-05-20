@@ -5,12 +5,13 @@ import { IoMdClose, IoMdInformationCircle } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { NotificationType } from "../../../Header";
 
-interface Notification {
+interface NotificationProps {
   notifications: NotificationType[];
   onClose: () => void;
   deleteNotif: () => void;
   markAsRead: (id: string) => void;
   setNotifications: React.Dispatch<SetStateAction<NotificationType[]>>;
+  activeRole: string;
 }
 
 dayjs.extend(relativeTime);
@@ -41,10 +42,15 @@ const Notification = ({
   markAsRead,
   notifications,
   setNotifications,
+  activeRole,
   onClose,
-}: Notification) => {
+}: NotificationProps) => {
   const notifRef = useRef<HTMLDivElement | null>(null);
   const closeTimeoutRef = useRef<number | null>(null);
+
+  const filteredNotifications = notifications.filter(
+    (notif) => !notif.intended_role || notif.intended_role === activeRole
+  );
 
   useEffect(() => {
     const handleCloseNotification = (e: MouseEvent) => {
@@ -67,8 +73,11 @@ const Notification = ({
     if (closeTimeoutRef.current) {
       window.clearTimeout(closeTimeoutRef.current);
     }
-    if (notifications.length > 0) {
-      setNotifications([]);
+    if (filteredNotifications.length > 0) {
+      const remaining = notifications.filter(
+        (notif) => notif.intended_role && notif.intended_role !== activeRole
+      );
+      setNotifications(remaining);
       deleteNotif();
     }
     closeTimeoutRef.current = window.setTimeout(() => {
@@ -109,12 +118,12 @@ const Notification = ({
           {/* <p className="p-3 text-g   ray-500">No notifications</p> When no notification it must input null in the notification */}
 
           <div className="max-h-[70vh] overflow-y-auto sm:max-h-96">
-            {notifications && notifications.length === 0 ? (
+            {filteredNotifications && filteredNotifications.length === 0 ? (
               <p className="mb-1 p-3 text-sm text-gray-600 sm:p-4">
                 No notifications
               </p>
             ) : (
-              notifications?.map((notif) => (
+              filteredNotifications?.map((notif) => (
                 <Link key={notif.id} to={notif.url}>
                   <div
                     className="grid cursor-pointer grid-cols-6 border-b px-3 py-3 hover:bg-gray-200 sm:px-5 sm:py-4"

@@ -9,6 +9,7 @@ type NotificationSchema = {
     url: string;
     image_path?: string;
     message: string;
+    intended_role?: string;
   };
   read_at: Date | string;
   created_at: Date | string;
@@ -42,6 +43,7 @@ export const useNotifications = () => {
         name: notif.data.name,
         url: notif.data.url,
         image_path: notif.data.image_path,
+        intended_role: notif.data.intended_role,
       }));
 
       setNotifications(notifs);

@@ -17,16 +17,29 @@ class ResearchMonitoringFormNotification extends Notification implements ShouldB
     public $url;
     public $image_path;
     public $name;
+    public $intended_role;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($message, $url, $image_path, $name)
+    public function __construct($message, $url, $image_path, $name, $intended_role = null)
     {
         $this->message = $message;
         $this->url = $url;
         $this->image_path = $image_path;
         $this->name= $name;
+
+        if (!$intended_role && $url) {
+            $cleanUrl = ltrim($url, '/');
+            if (str_starts_with($cleanUrl, 'faculty') || str_starts_with($cleanUrl, 'create')) {
+                $intended_role = 'faculty';
+            } elseif (str_starts_with($cleanUrl, 'admin')) {
+                $intended_role = 'admin';
+            } elseif (str_starts_with($cleanUrl, 'research-monitoring-form')) {
+                $intended_role = 'research-coordinator';
+            }
+        }
+        $this->intended_role = $intended_role;
     }
 
     /**
@@ -55,6 +68,7 @@ class ResearchMonitoringFormNotification extends Notification implements ShouldB
             'url' => $this->url,
             'image_path' => $this->image_path ?? '',
             'name' => $this->name ?? '',
+            'intended_role' => $this->intended_role,
             'created_at' => now(),
             'read_at' => null,
         ];
@@ -66,6 +80,7 @@ class ResearchMonitoringFormNotification extends Notification implements ShouldB
             'url' => $this->url,
             'image_path' => $this->image_path ?? '',
             'name' => $this->name ?? '',
+            'intended_role' => $this->intended_role,
             'created_at' => now(),
             'read_at' => null,
         ]);

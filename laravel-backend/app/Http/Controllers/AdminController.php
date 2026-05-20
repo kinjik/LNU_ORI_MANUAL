@@ -281,11 +281,17 @@ class AdminController extends Controller
         $user['coordinator_name'] = $coordinator ? $coordinator->getFullName() : 'Unknown Coordinator';
 
         // Fetch SystemSettings
-        $execDirector = \App\Models\SystemSetting::where('key', 'signatory_executive_director')->first();
+        $execDirector  = \App\Models\SystemSetting::where('key', 'signatory_executive_director')->first();
         $vicePresident = \App\Models\SystemSetting::where('key', 'signatory_vice_president')->first();
+        $headerImage   = \App\Models\SystemSetting::where('key', 'report_header_image')->first();
 
-        $user['signatory_executive_director'] = $execDirector ? $execDirector->value : '';
-        $user['signatory_vice_president'] = $vicePresident ? $vicePresident->value : '';
+        $user['signatory_executive_director'] = $execDirector  ? $execDirector->value  : '';
+        $user['signatory_vice_president']     = $vicePresident ? $vicePresident->value : '';
+
+        // Return full public URL so react-pdf can fetch it directly
+        $user['report_header_image'] = $headerImage && $headerImage->value
+            ? \Illuminate\Support\Facades\Storage::disk('public')->url($headerImage->value)
+            : null;
 
         return $this->success($user);
     }

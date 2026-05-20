@@ -55,6 +55,7 @@ class PointsNotification extends Notification implements ShouldBroadcast
             'url' => $this->url,
             'image_path' => $this->image_path ?? '',
             'name' => $this->name ?? '',
+            'intended_role' => 'faculty',
             'created_at' => now(),
             'read_at' => null,
         ];
@@ -66,6 +67,7 @@ class PointsNotification extends Notification implements ShouldBroadcast
             'url' => $this->url,
             'image_path' => $this->image_path ?? '',
             'name' => $this->name ?? '',
+            'intended_role' => 'faculty',
             'created_at' => now(),
             'read_at' => null,
         ]);

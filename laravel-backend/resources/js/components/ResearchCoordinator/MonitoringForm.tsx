@@ -11,18 +11,9 @@ import PublishedResearchForm from "./components/PublishedResearchForm";
 import CitationsForm from "./components/CitationsForm";
 import OtherResearchForm from "./components/OtherResearchForm";
 import GenericResearchForm from "./components/GenericResearchForm";
+import { getImageUrl } from "../../utils/imageUrl";
 
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return "https://via.placeholder.com/150";
-  
-  if (path.startsWith("http://localhost/storage")) {
-      return path.replace("http://localhost/", "http://localhost:8000/");
-  }
 
-  if (path.startsWith("http")) return path; 
-
-  return `http://localhost:8000/storage/${path}`; 
-};
 const MonitoringForm = () => {
   const { id } = useParams();
 
@@ -46,7 +37,7 @@ const MonitoringForm = () => {
               {data?.users.image_path ? (
                 <div className="h-20 w-20 overflow-hidden rounded-full ring-4 ring-blue-500">
                   <img
-                    src={getImageUrl(data?.users.image_path)}
+                    src={getImageUrl(data?.users.image_path, "https://via.placeholder.com/150")}
                     alt="Profile Image"
                     className="h-full w-full object-cover"
                   />

@@ -11,30 +11,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../../hooks/useToast";
 import { User } from "../../shared/types/types";
+import { getImageUrl } from "../../../utils/imageUrl";
 
-// --- THE ULTIMATE IMAGE HELPER ---
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return profileIcon;
-
-  try {
-    let cleanPath = path.replace(/\\/g, "/");
-
-    if (cleanPath.startsWith("http") && !cleanPath.includes("localhost") && !cleanPath.includes("127.0.0.1")) {
-        return cleanPath;
-    }
-
-    if (cleanPath.includes("/storage/")) {
-        cleanPath = cleanPath.substring(cleanPath.indexOf("/storage/") + 9);
-    }
-
-    cleanPath = cleanPath.replace(/^public\//, "").replace(/^\//, "");
-
-    return `/storage/${cleanPath}?t=${new Date().getTime()}`;
-
-  } catch (error) {
-    return profileIcon;
-  }
-};
 
 const initialData = {
   id: 0,
@@ -235,7 +213,7 @@ export default function ProfileSettings() {
             >
             <img
               key={profilePic || formData.image_path}
-              src={profilePic || getImageUrl(formData.image_path)}
+              src={profilePic || getImageUrl(formData.image_path, profileIcon)}
               alt="Profile Picture"
               className="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 object-cover"
               onError={(e) => {

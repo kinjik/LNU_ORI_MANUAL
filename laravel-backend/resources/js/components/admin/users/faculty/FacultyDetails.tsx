@@ -8,27 +8,14 @@ import {
 import { UserType } from "../../types";
 import Button from "../../../shared/components/Button";
 import { useToast } from "../../../../hooks/useToast";
+import { getImageUrl } from "../../../../utils/imageUrl";
 
 type FacultyFormType = Omit<
   UserType,
   "id" | "roles" | "research_monitoring_form"
 >;
 
-// --- FIX: Helper to fix broken image URLs ---
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return "https://via.placeholder.com/150";
-  
-  if (path.startsWith("http")) {
-      // Force port 8000 if it's pointing to localhost without a port
-      if (path.includes("localhost") || path.includes("127.0.0.1")) {
-         return path.replace(/http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, "http://localhost:8000");
-      }
-      return path;
-  }
-  // Prefix relative paths
-  return `http://localhost:8000/storage/${path}`; 
-};
-// --------------------------------------------
+
 
 const FacultyDetails = () => {
   const { id } = useParams();
@@ -106,8 +93,7 @@ const FacultyDetails = () => {
             <h1 className="mb-6 text-xl font-bold">Faculty Details</h1>
             <div>
               <img
-                // --- FIX: Use helper function here ---
-                src={getImageUrl(formData.image_path)}
+                src={getImageUrl(formData.image_path, "https://via.placeholder.com/150")}
                 alt="User Profile"
                 className="my-5 h-32 w-32 object-cover shadow-lg transition-shadow duration-300 hover:shadow-xl"
               />

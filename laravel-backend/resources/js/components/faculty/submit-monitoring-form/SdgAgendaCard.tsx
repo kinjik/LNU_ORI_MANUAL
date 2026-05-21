@@ -1,42 +1,13 @@
 import { useState } from "react";
 import { MdImage } from "react-icons/md";
 import { SDGMapping, AgendaMapping } from "../../shared/types/types";
+import { getImageUrl } from "../../../utils/imageUrl";
 
 interface CardProps {
   card: SDGMapping | AgendaMapping;
   onClick?: () => void;
   className?: string;
 }
-
-/**
- * Resolves an image_path from the DB to a full URL.
- *
- * Two possible formats exist in the DB:
- *  1. Seeder images  → "images/sdg/sdg1.png"  (live in public/images/, served directly)
- *  2. Admin uploads  → "images/some-file.png"  (live in storage/app/public/, need /storage/ prefix)
- *
- * We distinguish them by checking whether the path starts with "images/sdg/" or "images/agenda/"
- * (seeder convention). Everything else is assumed to be a Storage::disk('public') upload.
- */
-const BASE_URL = "http://localhost:8000";
-
-const getImageUrl = (path: string | null | undefined): string => {
-  if (!path) return "";
-
-  if (path.startsWith("http")) return path;
-
-  const normalised = path.startsWith("/") ? path.slice(1) : path;
-
-  const isPublicStaticImage =
-    normalised.startsWith("images/sdg/") ||
-    normalised.startsWith("images/agenda/");
-
-  if (isPublicStaticImage) {
-    return `${BASE_URL}/${normalised}`;
-  }
-
-  return `${BASE_URL}/storage/${normalised}`;
-};
 
 
 export const Card = ({ card, onClick, className }: CardProps) => {

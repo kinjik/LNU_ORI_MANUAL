@@ -105,7 +105,9 @@ class User extends Authenticatable
     protected function imagePath(): Attribute
     {
         return Attribute::make(
-            get: fn(?string $val) => $val ?  config('myconfig.app_url') . '/storage/' . $val : null
+            get: fn(?string $val) => $val
+                ? \Illuminate\Support\Facades\Storage::disk('public')->url($val)
+                : null
         );
     }
 }

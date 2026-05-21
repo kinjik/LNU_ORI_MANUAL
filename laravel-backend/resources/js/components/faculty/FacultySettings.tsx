@@ -7,6 +7,7 @@ import { User } from "../shared/types/types";
 import api from "../api/axios";
 import axios from "axios";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { getImageUrl } from "../../utils/imageUrl";
 
 const initialData = {
   id: 0,
@@ -25,17 +26,7 @@ const initialData = {
   updated_at: null,
   roles: [{ id: 1, name: "" }],
 };
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return "https://via.placeholder.com/150"; 
 
-  if (path.startsWith("http://localhost/storage")) {
-      return path.replace("http://localhost/", "http://localhost:8000/");
-  }
-
-  if (path.startsWith("http")) return path; 
-
-  return `http://localhost:8000/storage/${path}`; 
-};
 const FacultySettings = () => {
   const toast = useToast();
   const [data, setData] = useState<User>(initialData);
@@ -233,7 +224,7 @@ const FacultySettings = () => {
                 className="relative h-20 w-20 cursor-pointer overflow-hidden rounded-full border-2 border-blue-500"
               >
                 <img
-                  src={getImageUrl(data.image_path)}
+                  src={getImageUrl(data.image_path, "https://via.placeholder.com/150")}
                   alt="Profile"
                   loading="lazy"
                   className="h-full w-full object-cover"

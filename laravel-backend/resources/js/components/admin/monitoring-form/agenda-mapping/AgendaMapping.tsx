@@ -1,20 +1,7 @@
 import { Link } from "react-router-dom";
 import useAgenda from "../../../../hooks/useAgendaMapping";
 import api from "../../../api/axios";
-
-// --- FIX: Robust Helper to fix ALL broken URLs ---
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return "https://placehold.co/150x150?text=Add+Image";
-  
-  if (path.startsWith("http")) {
-      if (path.includes("localhost") || path.includes("127.0.0.1")) {
-         return path.replace(/http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, "http://localhost:8000");
-      }
-      return path;
-  }
-
-  return `http://localhost:8000/storage/${path}`; 
-};
+import { getImageUrl } from "../../../../utils/imageUrl";
 
 export default function AgendaMapping() {
   const { agenda, isLoading } = useAgenda();
@@ -82,7 +69,7 @@ export default function AgendaMapping() {
                     <td className="px-6 py-3">
                       <Link to={`/admin-settings/agenda-mapping/edit-agenda/${data.id}`} title="Click to Change Image">
                         <img 
-                          src={getImageUrl(data.image_path)}  
+                          src={getImageUrl(data.image_path, "https://placehold.co/150x150?text=Add+Image")}  
                           alt="Agenda" 
                           loading="lazy" 
                           className="h-auto max-w-[100px] cursor-pointer rounded-md object-cover hover:opacity-80"

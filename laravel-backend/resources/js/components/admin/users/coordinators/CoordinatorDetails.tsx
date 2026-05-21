@@ -7,6 +7,7 @@ import {
 } from "../../../../constant/UserDropOptionsData";
 import Button from "../../../shared/components/Button";
 import { useToast } from "../../../../hooks/useToast";
+import { getImageUrl } from "../../../../utils/imageUrl";
 
 type CoordinatorData = {
   fname: string;
@@ -20,19 +21,7 @@ type CoordinatorData = {
   email: string;
 };
 
-// --- FIX 1: Helper to fix broken image URLs ---
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return "https://via.placeholder.com/150";
-  
-  if (path.startsWith("http")) {
-      if (path.includes("localhost") || path.includes("127.0.0.1")) {
-         return path.replace(/http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, "http://localhost:8000");
-      }
-      return path;
-  }
-  return `http://localhost:8000/storage/${path}`; 
-};
-// --------------------------------------------
+
 
 const CoordinatorDetails = () => {
   const { id } = useParams();
@@ -130,8 +119,7 @@ const CoordinatorDetails = () => {
             </h1>
             <div>
               <img
-                // FIX 2: Use the helper function here
-                src={getImageUrl(formData.image_path)}
+                src={getImageUrl(formData.image_path, "https://via.placeholder.com/150")}
                 alt="User Profile"
                 className="my-5 h-32 w-32 object-cover shadow-lg transition-shadow duration-300 hover:shadow-xl"
               />

@@ -6,6 +6,7 @@ import Notification from "./shared/components/Notifications/Notification";
 import echo from "../broadcast/echo";
 import { useNotifications } from "./shared/components/Notifications/useNotification";
 import { useLocation } from "react-router-dom";
+import { getImageUrl } from "../utils/imageUrl";
 
 export interface NotificationType {
   id: string;
@@ -23,19 +24,7 @@ interface HeaderProps {
   openMenu: boolean;
 }
 
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return "https://via.placeholder.com/150";
 
-
-  if (path.startsWith("http://localhost/storage")) {
-      return path.replace("http://localhost/", "http://localhost:8000/");
-  }
-
-
-  if (path.startsWith("http")) return path;
-
-  return `http://localhost:8000/storage/${path}`;
-};
 
 const Header = ({ toggleMenu, openMenu }: HeaderProps) => {
   const { user, activeRole } = useAuthContextProvider();
@@ -209,7 +198,7 @@ const Header = ({ toggleMenu, openMenu }: HeaderProps) => {
           {/* Profile Picture or Initials */}
           {user?.image_path ? (
             <img
-              src={getImageUrl(user.image_path)}
+              src={getImageUrl(user.image_path, "https://via.placeholder.com/150")}
               alt="Profile Icon"
               className="h-10 w-10 rounded-full"
             />

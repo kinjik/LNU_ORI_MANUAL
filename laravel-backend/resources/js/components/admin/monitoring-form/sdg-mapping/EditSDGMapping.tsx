@@ -3,6 +3,7 @@ import axios from "../../../api/axios";
 import { imagePlaceholder } from "../../../../assets/images";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../../../../hooks/useToast";
+import { getImageUrl } from "../../../../utils/imageUrl";
 
 type EventType = React.ChangeEvent<HTMLInputElement>;
 
@@ -12,16 +13,7 @@ interface SDGType {
   image_path: string;
 }
 
-// --- Helper to fix broken URLs ---
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return imagePlaceholder;
-  if (path.startsWith("http://localhost/storage")) {
-    return path.replace("http://localhost/", "http://localhost:8000/");
-  }
-  if (path.startsWith("http")) return path;
-  return `http://localhost:8000/storage/${path}`;
-};
-// -------------------------------------------------------------
+
 
 export default function EditSDGMapping() {
   const { id } = useParams();
@@ -61,7 +53,7 @@ export default function EditSDGMapping() {
 
         setInitialSDG(payload);
         setSDG(payload);
-        setSelectedImage(getImageUrl(data.image_path));
+        setSelectedImage(getImageUrl(data.image_path, imagePlaceholder));
         setLoading(false);
       } catch (error) {
         console.error("Failed to fetch SDG details:", error);

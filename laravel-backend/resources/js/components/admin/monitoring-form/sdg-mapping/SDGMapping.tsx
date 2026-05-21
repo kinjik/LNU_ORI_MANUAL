@@ -1,24 +1,9 @@
 import { Link } from "react-router-dom";
 import useSdg from "../../../../hooks/useSdgMapping";
 import api from "../../../api/axios";
+import { getImageUrl } from "../../../../utils/imageUrl";
 
-// --- FIX: Robust Helper to fix ALL broken URLs ---
-const getImageUrl = (path: string | null | undefined) => {
-  if (!path) return "https://placehold.co/150x150?text=Add+Image";
-  
-  // 1. Handle paths that look like URLs (http://...)
-  if (path.startsWith("http")) {
-      // If it points to localhost or 127.0.0.1 (incorrect port), force it to port 8000
-      if (path.includes("localhost") || path.includes("127.0.0.1")) {
-         return path.replace(/http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, "http://localhost:8000");
-      }
-      return path; // It's an external URL, keep it
-  }
 
-  // 2. Handle relative paths (newly uploaded files)
-  return `http://localhost:8000/storage/${path}`; 
-};
-// ----------------------------------------------------
 
 export const SDGMapping = () => {
   const { sdg, isLoading } = useSdg();
@@ -93,7 +78,7 @@ export const SDGMapping = () => {
                       {/* Clicking the image goes to Edit Page to Add/Change it */}
                       <Link to={`/admin-settings/sdg-mapping/edit-sdg/${data.id}`} title="Click to Add/Change Picture">
                         <img
-                          src={getImageUrl(data.image_path)}
+                          src={getImageUrl(data.image_path, "https://placehold.co/150x150?text=Add+Image")}
                           alt="SDG"
                           loading="lazy"
                           className="h-auto max-w-[100px] cursor-pointer rounded-md object-cover hover:opacity-80"

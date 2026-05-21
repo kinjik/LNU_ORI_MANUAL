@@ -69,21 +69,16 @@ class UserController extends Controller
 
     public function update(User $user, UpdateUserRequest $request)
     {
-        // THE FIX: Default to the user's EXISTING image path!
-        // This ensures the image isn't accidentally deleted if they only update their name.
+
         $updatedImage = $user->getRawOriginal('image_path');
 
-        // Only process the image if a new image_path was actually sent in the request
         if ($request->has('image_path') && !empty($request->image_path)) {
-            $filePath = Str::after($request->image_path, config('myconfig.app_url').'/storage/');
+            $storageBaseUrl = Storage::disk('public')->url('');
+            $filePath = Str::after($request->image_path, $storageBaseUrl);
 
             if ($filePath && Storage::disk('public')->exists($filePath)) {
-                // Check if the uploaded image is different from the current one
                 if (!Str::contains($request->image_path, $user->getRawOriginal('image_path'))) {
-                    // It's a new image, so move it to the final storage folder
                     $updatedImage = $this->moveToStorage($request->image_path);
-
-                    // Safely delete the old image from the hard drive
                     $oldImagePath = $user->getRawOriginal('image_path');
                     if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
                         Storage::disk('public')->delete($oldImagePath);

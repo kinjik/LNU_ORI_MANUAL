@@ -4,6 +4,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { IoMdClose, IoMdInformationCircle } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { NotificationType } from "../../../Header";
+import { getImageUrl } from "../../../../utils/imageUrl";
 
 interface NotificationProps {
   notifications: NotificationType[];
@@ -16,26 +17,7 @@ interface NotificationProps {
 
 dayjs.extend(relativeTime);
 
-const getImageUrl = (path: string | null | undefined): string => {
-  if (!path || typeof path !== "string") return "";
-  try {
-    let cleanPath = path.replace(/\\/g, "/");
-    // If full URL (localhost, 127.0.0.1, or any domain), extract pathname for relative URL
-    if (cleanPath.startsWith("http")) {
-      const url = new URL(cleanPath);
-      return url.pathname + (url.search || "");
-    }
-    if (cleanPath.includes("/storage/")) {
-      cleanPath = cleanPath.substring(cleanPath.indexOf("/storage/"));
-    } else {
-      cleanPath = cleanPath.replace(/^public\//, "").replace(/^\//, "");
-      cleanPath = `/storage/${cleanPath}`;
-    }
-    return cleanPath;
-  } catch {
-    return "";
-  }
-};
+
 
 const Notification = ({
   deleteNotif,

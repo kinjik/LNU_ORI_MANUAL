@@ -4,6 +4,25 @@ import { MouseEvent, useEffect } from "react";
 import { useAuthContextProvider } from "../../hooks/hooks";
 import { redirectLink } from "../../constant/redirectLinks";
 
+/** Scroll container for routed pages; avoids `scrollIntoView` scrolling `html`/`body` (mobile layout jump). */
+export const APP_LAYOUT_SCROLL_ROOT_ID = "app-layout-scroll";
+
+function scrollSectionIntoLayout(sectionId: string) {
+  const target = document.getElementById(sectionId);
+  if (!target) return;
+
+  const root = document.getElementById(APP_LAYOUT_SCROLL_ROOT_ID);
+  if (root) {
+    const rootRect = root.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const nextTop = root.scrollTop + (targetRect.top - rootRect.top);
+    root.scrollTo({ top: Math.max(0, nextTop), behavior: "smooth" });
+    return;
+  }
+
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 const Navbar = () => {
   const { user } = useAuthContextProvider();
   const location = useLocation();
@@ -21,27 +40,21 @@ const Navbar = () => {
     }
 
     event.preventDefault();
-    const target = document.getElementById(sectionId);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    scrollSectionIntoLayout(sectionId);
     window.history.replaceState(null, "", `#${sectionId}`);
   };
 
   useEffect(() => {
     if (!location.hash) return;
     const targetId = location.hash.slice(1);
-    const target = document.getElementById(targetId);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    scrollSectionIntoLayout(targetId);
   }, [location.hash]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background text-lg font-medium scrollbar-thin scrollbar-track-[#f1f1f1] scrollbar-thumb-[#c1c1c1]">
+    <div className="flex h-svh min-h-0 flex-col overflow-hidden bg-background text-lg font-medium scrollbar-thin scrollbar-track-[#f1f1f1] scrollbar-thumb-[#c1c1c1]">
       <div className="flex min-h-0 flex-1 flex-col">
-        <nav className="sticky left-0 right-0 top-0 z-30 flex flex-wrap items-center justify-between gap-3 bg-primary p-2 px-4 shadow-custom">
-          <Link to="/" className="flex items-center">
+        <nav className="relative z-30 flex shrink-0 flex-wrap items-center gap-3 bg-primary p-2 px-4 shadow-custom">
+          <Link to="/" className="flex shrink-0 items-center">
             {/* Logo */}
             <img
               src={lnuOri}
@@ -50,8 +63,8 @@ const Navbar = () => {
               loading="lazy"
             />
           </Link>
-          <div className="flex flex-1 items-center justify-end">
-            <ul className="flex flex-wrap items-center gap-2 pr-0 text-white sm:gap-4 md:gap-6 lg:gap-10">
+          <div className="ml-auto flex items-center">
+            <ul className="flex flex-wrap items-center justify-end gap-2 pr-0 text-white sm:gap-4 md:gap-6 lg:gap-10">
               <li>
                 <Link
                   to={homeLink}
@@ -94,7 +107,10 @@ const Navbar = () => {
             </ul>
           </div>
         </nav>
-        <main className="flex-1 min-h-0 overflow-y-auto">
+        <main
+          id={APP_LAYOUT_SCROLL_ROOT_ID}
+          className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
+        >
           <Outlet />
         </main>
       </div>

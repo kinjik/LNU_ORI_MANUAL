@@ -49,7 +49,7 @@ const AttendanceToResearch = ({
     setOpenApproveModal(false);
     const variables: UpdateMonitoringFormVariables = {
       id: attendancetoresearch.researchmonitoringform_id,
-      status: Array(documents.length).fill(STATUS_TYPE.APPROVED),
+      status: Array(documents.length).fill(STATUS_TYPE.EVALUATED),
       isAdmin: false,
       rejected_message: "",
     };
@@ -207,7 +207,7 @@ const AttendanceToResearch = ({
               onClick={() => setOpenApproveModal(true)}
               disabled={loading}
             >
-              Approve
+              Evaluate
             </button>
             <button
               className="rounded-md bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-800 disabled:opacity-50"
@@ -269,7 +269,7 @@ const AttendanceToResearch = ({
 
       <ConfirmationModal
         isOpen={openApproveModal}
-        message="Are you sure you want to APPROVE this research monitoring form?"
+        message="Are you sure you want to EVALUATE this research monitoring form?"
         onCancel={() => setOpenApproveModal(false)}
         onConfirm={handleApprove}
         type="submit"

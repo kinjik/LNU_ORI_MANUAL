@@ -167,7 +167,7 @@ const OtherResearchForm = ({
                     <option selected disabled>
                       Pending
                     </option>
-                    <option value={STATUS_TYPE.APPROVED}>Approve</option>
+                    <option value={STATUS_TYPE.EVALUATED}>Evaluate</option>
                     <option value={STATUS_TYPE.REJECT}>Reject</option>
                   </select>
                 ) : (
@@ -193,7 +193,7 @@ const OtherResearchForm = ({
       </div>
       <ConfirmationModal
         isOpen={openModal}
-        message={`Are you sure you want ${Object.values(status).includes(STATUS_TYPE.APPROVED) ? "Approve" : "Reject"} this research monitoring form?`}
+        message={`Are you sure you want ${Object.values(status).includes(STATUS_TYPE.EVALUATED) ? "Evaluate" : "Reject"} this research monitoring form?`}
         onCancel={() => setOpenModal(false)}
         onConfirm={handleClick}
         type="submit"

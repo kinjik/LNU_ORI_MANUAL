@@ -56,7 +56,7 @@ const GenericResearchForm = ({
     setOpenModal(false);
     setOpenRejectedModal(false);
 
-    const isApproving = status.current[0] === STATUS_TYPE.APPROVED;
+    const isApproving = status.current[0] === STATUS_TYPE.EVALUATED;
     const isRejecting = status.current[0] === STATUS_TYPE.REJECT;
 
     const variables: UpdateMonitoringFormVariables = {
@@ -71,7 +71,7 @@ const GenericResearchForm = ({
       refetchData();
 
       if (isApproving) {
-        toast.success("Form successfully approved!");
+        toast.success("Form successfully evaluated!");
       } else if (isRejecting) {
         toast.success("Form rejected.");
       } else {
@@ -205,12 +205,12 @@ const GenericResearchForm = ({
             <button
               className="rounded-md bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
               onClick={() => {
-                status.current = [STATUS_TYPE.APPROVED];
+                status.current = [STATUS_TYPE.EVALUATED];
                 setOpenModal(true);
               }}
               disabled={loading}
             >
-              Approve
+              Evaluate
             </button>
             <button
               className="rounded-md bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-800 disabled:opacity-50"
@@ -233,7 +233,7 @@ const GenericResearchForm = ({
       <ConfirmationModal
         isOpen={openModal}
         type="submit"
-        message={`Are you sure you want to approve this research monitoring form?`}
+        message={`Are you sure you want to evaluate this research monitoring form?`}
         onCancel={() => setOpenModal(false)}
         onConfirm={handleClick}
       />

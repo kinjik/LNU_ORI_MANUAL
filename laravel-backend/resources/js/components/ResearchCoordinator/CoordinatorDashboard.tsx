@@ -33,7 +33,7 @@ const CoordinatorDashboard = () => {
         <Link to="/approved">
           <Card
             borderColor="border-blue-400"
-            title="Total Approved"
+            title="Total Evaluated"
             total={coordinatorData.totalApproved}
             icon={<LuFileCheck size={30} />}
           />

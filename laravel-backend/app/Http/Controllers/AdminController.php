@@ -40,6 +40,7 @@ class AdminController extends Controller
 
 
         $totalEvaluated = ResearchMonitoringForm::where('status', ResearchMonitoringFormStatus::EVALUATED)->count();
+        $totalApproved = ResearchMonitoringForm::where('status', ResearchMonitoringFormStatus::APPROVED)->count();
 
         $usersCount = User::role([RoleEnum::FACULTY, RoleEnum::RESEARCH_COORDINATOR])->count();
 
@@ -225,6 +226,7 @@ class AdminController extends Controller
             "highest_points" => $highestPoints,
             "total_count" => $totalCount,
             "total_evaluated" => $totalEvaluated,
+            "total_approved" => $totalApproved,
             "recent_approved" => $approvedResearch,
             "charts" => $charts,
         ], 'Data retrieved succesfully');

@@ -34,9 +34,9 @@ export default function AdminDashboard() {
         : "",
     },
     {
-      title: "Evaluated Submission",
+      title: "Approved Submissions",
       border: "border-pink-600",
-      total: data?.total_evaluated,
+      total: data?.total_approved,
       icon: <MdCheckCircleOutline size={60} className="text-pink-600" />,
     },
   ];

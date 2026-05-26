@@ -93,7 +93,7 @@ const CoordinatorSidebar = () => {
                     >
                       <div className="flex items-center justify-start space-x-1">
                         <LuFileCheck className="mt-1" />
-                        <span>Approved</span>
+                        <span>Evaluated</span>
                       </div>
                     </NavLink>
                   </li>

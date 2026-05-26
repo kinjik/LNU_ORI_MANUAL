@@ -72,7 +72,7 @@ class ResearchMonitoringFormController extends Controller
                     ->orWhere('reviewed_by', $name)->paginate(5);
 
                 $totalApproved = (clone $query)
-                    ->where('status', ResearchMonitoringFormStatus::APPROVED)
+                    ->where('status', ResearchMonitoringFormStatus::EVALUATED)
                     ->count();
 
                 $totalPending = (clone $query)
@@ -126,6 +126,21 @@ class ResearchMonitoringFormController extends Controller
         // $entities[] = ['users', 'researchdocuments', 'agendaMappings', 'sdgMappings', 'otherresearch', 'citations', 'production', 'attendancetoresearch', 'researchproduction.ongoing', 'researchproduction.completed', 'researchproduction.presented', 'researchproduction.published', 'creativeworksperformingarts', 'creativeworksexhibition', 'creativeworksliterary', 'creativeworksdesign'];
 
         $researchForm->load('researchdocuments:id,file_name,status,researchmonitoringform_id', 'sdgMappings', 'agendaMappings');
+
+        // Notify all coordinators in the same college that a new form has been submitted
+        $submitter = Auth::user();
+        $coordinators = User::role(RoleEnum::RESEARCH_COORDINATOR)
+            ->where('college', $submitter->college)
+            ->get();
+
+        if ($coordinators->isNotEmpty()) {
+            Notification::send($coordinators, new ResearchMonitoringFormNotification(
+                $submitter->getFullName() . ' has submitted a new Research Monitoring Form',
+                'research-monitoring-form/' . $researchForm->id,
+                $submitter->image_path ?? '',
+                $submitter->getFullName()
+            ));
+        }
 
         return $this->success($researchForm, "Research Monitoring form added");
     }
@@ -222,32 +237,39 @@ class ResearchMonitoringFormController extends Controller
 
             $status = ResearchMonitoringFormStatus::REJECTED->value;
         } else {
+            // Coordinator has finished reviewing — move to EVALUATED (awaiting Admin final approval)
             $form->update([
-                'status'      => ResearchMonitoringFormStatus::APPROVED,
-                'reviewed_by' => $user->getFullName(),
-                'reviewed_at' => now()->format('m/d/Y h:i a'),
+                'status'           => ResearchMonitoringFormStatus::EVALUATED,
+                'reviewed_by'      => $user->getFullName(),
+                'reviewed_at'      => now()->format('m/d/Y h:i a'),
+                'evaluated_at'     => now()->format('m/d/Y h:i a'),
                 'rejected_message' => null,
             ]);
 
-            $status = ResearchMonitoringFormStatus::APPROVED->value;
+            $status = ResearchMonitoringFormStatus::EVALUATED->value;
         }
 
-        $admins = User::role(RoleEnum::ADMIN);
+        $admins = User::role(RoleEnum::ADMIN)->get();
         $faculty = User::find($form->users_id);
 
-        Notification::send($admins, new ResearchMonitoringFormNotification(
-            'Research Monitoring Form has been ' . $status,
-            'admin/research-monitoring-form/' . $form->id,
-            '',
-            ''
-        ));
-
-        $faculty->notify(new ResearchMonitoringFormNotification(
-            'Your research monitoring form requires ' . $status,
-            'faculty/research-monitoring-form/' . $form->id,
-            $faculty->image_path ?? '',
-            ''
-        ));
+        if (!$isResubmission && !$isRejected) {
+            // EVALUATED: notify Admin to perform final approval
+            Notification::send($admins, new ResearchMonitoringFormNotification(
+                $faculty->getFullName() . "'s Research Monitoring Form is ready for final approval",
+                '/research-monitoring/' . $form->id,
+                $faculty->image_path ?? '',
+                $faculty->getFullName(),
+                'admin'
+            ));
+        } else {
+            // RESUBMISSION or REJECTED: notify Faculty of the coordinator's decision
+            $faculty->notify(new ResearchMonitoringFormNotification(
+                'Your research monitoring form has been ' . $status,
+                'faculty/research-monitoring-form/' . $form->id,
+                $faculty->image_path ?? '',
+                ''
+            ));
+        }
 
         return $this->success($form, 'Research Monitoring Form and Research Document status updated');
     }
@@ -262,14 +284,13 @@ class ResearchMonitoringFormController extends Controller
 
             $status = ResearchMonitoringFormStatus::REJECTED->value;
         } else {
-
+            // Admin gives final approval
             $form->update([
-                'status' => ResearchMonitoringFormStatus::EVALUATED, 
-                'evaluated_at' => now()->format('m/d/Y h:i a'),
+                'status'           => ResearchMonitoringFormStatus::APPROVED,
                 'rejected_message' => null,
             ]);
 
-            $status = ResearchMonitoringFormStatus::EVALUATED->value;
+            $status = ResearchMonitoringFormStatus::APPROVED->value;
         }
 
         if ($request->points) {

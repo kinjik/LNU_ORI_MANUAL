@@ -227,12 +227,12 @@ const CitationsForm = ({
             </React.Fragment>
           ))}
         </div>
-        {formStatus === STATUS_TYPE.APPROVED && (
+        {formStatus === STATUS_TYPE.EVALUATED && (
           <div className="w-full text-end">
             <Button
               className="me-3 mt-5 place-self-end rounded-md bg-green-500 px-5 py-2 font-semibold text-white enabled:hover:bg-green-800 disabled:cursor-progress disabled:opacity-50"
               onClick={() => {
-                status.current = [STATUS_TYPE.EVALUATED];
+                status.current = [STATUS_TYPE.APPROVED];
                 setOpenModal(true);
               }}
               isDisabled={isLoading}
@@ -241,7 +241,7 @@ const CitationsForm = ({
               {isLoading ? (
                 <AiOutlineLoading3Quarters className="mx-auto animate-spin text-white transition-all duration-300" />
               ) : (
-                "Evaluate"
+                "Approve"
               )}
             </Button>
             <Button

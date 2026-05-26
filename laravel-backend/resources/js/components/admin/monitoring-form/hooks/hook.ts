@@ -75,6 +75,7 @@ type AdminDashboardType = {
   };
   total_count: number;
   total_evaluated: number;
+  total_approved: number;
   recent_approved: ResearchMonitoringForm[];
   charts: ChartsType;
 };

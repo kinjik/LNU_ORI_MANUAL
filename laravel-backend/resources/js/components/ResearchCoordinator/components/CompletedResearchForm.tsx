@@ -190,12 +190,12 @@ const CompletedResearchForm = ({
             <button
               className="rounded-md bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
               onClick={() => {
-                status.current = [STATUS_TYPE.APPROVED];
+                status.current = [STATUS_TYPE.EVALUATED];
                 setOpenModal(true);
               }}
               disabled={loading}
             >
-              Approve
+              Evaluate
             </button>
             <button
               className="rounded-md bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-800 disabled:opacity-50"
@@ -217,7 +217,7 @@ const CompletedResearchForm = ({
       <ConfirmationModal
         isOpen={openModal}
         type="submit"
-        message={`Are you sure you want ${status.current[0] === STATUS_TYPE.APPROVED ? "approve" : "reject"} this research monitoring form?`}
+        message={`Are you sure you want ${status.current[0] === STATUS_TYPE.EVALUATED ? "evaluate" : "reject"} this research monitoring form?`}
         onCancel={() => setOpenModal(false)}
         onConfirm={handleClick}
       />

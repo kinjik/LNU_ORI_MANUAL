@@ -17,7 +17,7 @@ const ApprovedMonitoringForm = () => {
   const ref = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    setParams((prev) => ({ ...prev, status: STATUS_TYPE.APPROVED }));
+    setParams((prev) => ({ ...prev, status: STATUS_TYPE.EVALUATED }));
     refetchData();
   }, []);
 
@@ -26,7 +26,7 @@ const ApprovedMonitoringForm = () => {
 
     setParams((prev) => ({
       ...prev,
-      status: STATUS_TYPE.APPROVED,
+      status: STATUS_TYPE.EVALUATED,
       search: ref.current?.value as string,
     }));
 
@@ -38,7 +38,7 @@ const ApprovedMonitoringForm = () => {
   };
   return (
     <section>
-      <h1 className="text-2xl font-semibold">Approved Submissions</h1>
+      <h1 className="text-2xl font-semibold">Evaluated Submissions</h1>
 
       <form
         onSubmit={handleSubmit}

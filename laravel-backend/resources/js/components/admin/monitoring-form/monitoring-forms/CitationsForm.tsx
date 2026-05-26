@@ -21,8 +21,10 @@ import { parseDate } from "../../../util/parseDate";
 type CitationsFormProps = {
   citations: CitationsType;
   documents: Researchdocument[];
-  formStatus: string;
   points: number;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  formStatus?: string;
 };
 
 const CitationsForm = ({
@@ -30,6 +32,8 @@ const CitationsForm = ({
   documents,
   formStatus,
   points,
+  coauthors,
+  externalAuthors,
 }: CitationsFormProps) => {
   const [openModal, setOpenModal] = useState(false);
   const [openRejectedModal, setOpenRejectedModal] = useState(false);
@@ -80,12 +84,35 @@ const CitationsForm = ({
         <label htmlFor="authors" className="mt-5 text-sm">
           Authors
         </label>
-        <input
-          id="authors"
-          value={citations.authors}
-          disabled
-          className="w-auto text-ellipsis border-b border-b-slate-600 py-1 ps-1 text-start text-sm capitalize"
-        />
+        <div className="flex flex-wrap gap-2 mt-1">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <input
+              id="authors"
+              value={citations.authors}
+              disabled
+              className="w-auto text-ellipsis border-b border-b-slate-600 py-1 ps-1 text-start text-sm capitalize"
+            />
+          )}
+        </div>
 
         <label htmlFor="datePublished" className="mt-5 text-sm">
           Date Publication
@@ -281,3 +308,5 @@ const CitationsForm = ({
 };
 
 export default CitationsForm;
+
+

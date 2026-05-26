@@ -32,7 +32,19 @@ class CitationsRequest extends FormRequest
 
             'citations.authors' => ['nullable', 'string'],
             'citations.author_ids' => ['required', 'array'],
-            'citations.author_ids.*' => ['integer', 'exists:users,id'],
+            'citations.author_ids.*' => [
+                function ($attribute, $value, $fail) {
+                    if (is_numeric($value)) {
+                        if (!\Illuminate\Support\Facades\DB::table('users')->where('id', $value)->exists()) {
+                            $fail('The selected author is invalid.');
+                        }
+                    } elseif (!is_string($value)) {
+                        $fail('The author must be a valid user ID or a string name.');
+                    } elseif (strlen($value) > 255) {
+                        $fail('The custom author name must not exceed 255 characters.');
+                    }
+                }
+            ],
             'citations.cited_authors' => ['required', 'string'],
             'citations.cited_article_title' => ['required', 'string'],
             'citations.research_title' => ['required', 'string'],
@@ -46,3 +58,4 @@ class CitationsRequest extends FormRequest
         ];
     }
 }
+

@@ -5,10 +5,10 @@ type Faculty = { id: number; name: string };
 type CoAuthorSelectProps = {
   /** All available faculty options */
   options: Faculty[];
-  /** Currently selected user IDs */
-  value: number[];
+  /** Currently selected user IDs and custom string names */
+  value: (number | string)[];
   /** Called when the selection changes */
-  onChange: (ids: number[]) => void;
+  onChange: (ids: (number | string)[]) => void;
   /** The currently logged-in user's ID — always selected and cannot be removed */
   currentUserId: number;
   /** Custom label for the placeholder text */
@@ -42,7 +42,7 @@ const CoAuthorSelect = ({
     o.name.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const toggle = (id: number) => {
+  const toggle = (id: number | string) => {
     // Current user cannot be deselected
     if (id === currentUserId) return;
     if (value.includes(id)) {
@@ -52,15 +52,32 @@ const CoAuthorSelect = ({
     }
   };
 
-  const removeChip = (id: number) => {
+  const removeChip = (id: number | string) => {
     if (id === currentUserId) return;
     onChange(value.filter((v) => v !== id));
   };
 
+  const handleAddCustom = (e?: React.MouseEvent | React.KeyboardEvent) => {
+    if (e) e.preventDefault();
+    const val = search.trim();
+    if (val.length > 0 && !value.includes(val)) {
+      onChange([...value, val]);
+      setSearch("");
+      setIsOpen(false);
+    }
+  };
+
   const selectedNames = value.map((id) => {
+    if (typeof id === 'string') {
+      return { id, name: id };
+    }
     const f = options.find((o) => o.id === id);
     return f ? { id, name: f.name } : null;
-  }).filter(Boolean) as { id: number; name: string }[];
+  }).filter(Boolean) as { id: number | string; name: string }[];
+
+  const showAddCustom = search.trim().length > 0 && 
+                        !filtered.find(f => f.name.toLowerCase() === search.trim().toLowerCase()) && 
+                        !value.includes(search.trim());
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -101,18 +118,36 @@ const CoAuthorSelect = ({
       {/* Dropdown */}
       {isOpen && (
         <div className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg">
-          <div className="sticky top-0 bg-white p-2">
+          <div className="sticky top-0 bg-white p-2 border-b border-gray-100">
             <input
               autoFocus
               type="text"
-              placeholder="Search faculty…"
+              placeholder="Search faculty or type external name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && search.trim().length > 0) {
+                  handleAddCustom(e);
+                }
+              }}
               className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
-          {filtered.length === 0 ? (
+          
+          {showAddCustom && (
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddCustom();
+              }}
+              className="flex cursor-pointer items-center justify-between px-3 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100"
+            >
+              <span className="font-medium">+ Add "{search.trim()}"</span>
+            </div>
+          )}
+
+          {filtered.length === 0 && !showAddCustom ? (
             <p className="px-3 py-2 text-sm text-gray-400">No results found</p>
           ) : (
             filtered.map((f) => {

@@ -70,11 +70,21 @@ class GenericResearchController extends Controller
             ResearchDocument::insert($docs);
 
             // Build collaborators fallback string
-            $authorIds    = $validated['generic']['author_ids'] ?? [];
-            if (!in_array(Auth::id(), $authorIds)) {
-                $authorIds[] = Auth::id();
+            $authorPayload = $validated['generic']['author_ids'] ?? [];
+            $registeredIds = [Auth::id()];
+            $externalAuthors = [];
+
+            foreach ($authorPayload as $author) {
+                if (is_numeric($author)) {
+                    $registeredIds[] = (int) $author;
+                } else {
+                    $externalAuthors[] = $author;
+                }
             }
-            $collaboratorsStr = count($authorIds) > 1 ? 'Multiple Collaborators (See Database)' : $user->getFullName();
+
+            $registeredIds = array_unique($registeredIds);
+            
+            $collaboratorsStr = count($registeredIds) + count($externalAuthors) > 1 ? 'Multiple Collaborators (See Database)' : $user->getFullName();
 
             GenericResearchProduction::create([
                 'dynamic_data'              => $validated['generic']['dynamic_data'] ?? null,
@@ -82,7 +92,8 @@ class GenericResearchController extends Controller
                 'researchmonitoringform_id' => $researchForm->id,
             ]);
 
-            $researchForm->coauthors()->sync($authorIds);
+            $researchForm->coauthors()->sync($registeredIds);
+            $researchForm->update(['external_authors' => $externalAuthors]);
 
             $rating = $this->rating($points);
             Point::create([

@@ -1,7 +1,7 @@
 // In your api/axios.ts file
 import axios from "axios";
 
-let initialLoadCompleted = false;
+
 
 export const setInitialLoadCompleted = (value: boolean) => {
   initialLoadCompleted = value;

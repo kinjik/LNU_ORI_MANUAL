@@ -34,7 +34,19 @@ class PublishedResearchProductionRequest extends FormRequest
             'published.authorship_nature' => 'required|string|max:255',
             'published.authors' => 'nullable|string',
             'published.author_ids' => 'required|array',
-            'published.author_ids.*' => 'integer|exists:users,id',
+            'published.author_ids.*' => [
+                function ($attribute, $value, $fail) {
+                    if (is_numeric($value)) {
+                        if (!\Illuminate\Support\Facades\DB::table('users')->where('id', $value)->exists()) {
+                            $fail('The selected author is invalid.');
+                        }
+                    } elseif (!is_string($value)) {
+                        $fail('The author must be a valid user ID or a string name.');
+                    } elseif (strlen($value) > 255) {
+                        $fail('The custom author name must not exceed 255 characters.');
+                    }
+                }
+            ],
             'published.research_field_id' => 'required|exists:research_fields,id',
             'published.research_type_id' => 'required|exists:research_types,id',
             'published.socio_economic_objective_id' => 'required|exists:socio_economic_objectives,id',
@@ -58,3 +70,4 @@ class PublishedResearchProductionRequest extends FormRequest
         ];
     }
 }
+

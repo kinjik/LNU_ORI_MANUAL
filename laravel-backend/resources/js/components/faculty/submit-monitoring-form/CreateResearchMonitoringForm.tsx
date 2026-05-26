@@ -31,18 +31,18 @@ export type FormData = {
   agenda_mappings: number[];
   // selectedFile: number | null;
   completed: Completedresearchprod &
-    Omit<Research, "id" | "user_id"> & { points: number; author_ids: number[] };
-  presented: Presentedresearchprod & { points: number; author_ids: number[] };
+    Omit<Research, "id" | "user_id"> & { points: number; author_ids: (number | string)[] };
+  presented: Presentedresearchprod & { points: number; author_ids: (number | string)[] };
   published: Publishedresearchprod &
-    Omit<Research, "id" | "user_id"> & { points: number; author_ids: number[] };
-  citations: CitationsType & { points: number; author_ids: number[] };
-  participation: ResearchAttendance & { points: number; author_ids: number[] };
-  intellectual: IntellectualPropertyType & { points: number; author_ids: number[] };
-  peerjournal: PeerReviewType & { points: number; author_ids: number[] };
+    Omit<Research, "id" | "user_id"> & { points: number; author_ids: (number | string)[] };
+  citations: CitationsType & { points: number; author_ids: (number | string)[] };
+  participation: ResearchAttendance & { points: number; author_ids: (number | string)[] };
+  intellectual: IntellectualPropertyType & { points: number; author_ids: (number | string)[] };
+  peerjournal: PeerReviewType & { points: number; author_ids: (number | string)[] };
   otherresearch: OtherResearchType & { points: number };
   generic: {
     dynamic_data: Record<string, any>;
-    author_ids: number[];
+    author_ids: (number | string)[];
     points: number;
   };
 };

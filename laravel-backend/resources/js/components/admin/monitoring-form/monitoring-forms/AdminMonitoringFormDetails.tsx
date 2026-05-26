@@ -20,6 +20,17 @@ const AdminMonitoringFormDetails = () => {
 
   const fullName = `${data?.users.fname} ${data?.users.mi ? data?.users.mi + ". " : ""}${data?.users.lname} ${data?.users.suffix ? data?.users.suffix : ""}`;
 
+  let parsedExternalAuthors: string[] = [];
+  if (typeof data?.external_authors === 'string') {
+    try {
+      parsedExternalAuthors = JSON.parse(data.external_authors);
+    } catch (e) {
+      parsedExternalAuthors = [];
+    }
+  } else if (Array.isArray(data?.external_authors)) {
+    parsedExternalAuthors = data.external_authors;
+  }
+
   if (loading)
     return <AiOutlineLoading3Quarters className="my-5 size-7 animate-spin" />;
 
@@ -93,6 +104,8 @@ const AdminMonitoringFormDetails = () => {
             formStatus={data.status}
             participation={data.attendancetoresearch}
             points={data.points.points}
+            coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.presentedresearchprod && (
@@ -101,6 +114,8 @@ const AdminMonitoringFormDetails = () => {
             formStatus={data.status}
             presented={data.presentedresearchprod}
             documents={data.researchdocuments}
+            coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
 
@@ -110,6 +125,8 @@ const AdminMonitoringFormDetails = () => {
             documents={data.researchdocuments}
             formStatus={data.status}
             points={data.points.points}
+            coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.citations && (
@@ -118,6 +135,8 @@ const AdminMonitoringFormDetails = () => {
             documents={data.researchdocuments}
             formStatus={data.status}
             points={data.points.points}
+            coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.publishedresearchprod && (
@@ -126,6 +145,8 @@ const AdminMonitoringFormDetails = () => {
             documents={data.researchdocuments}
             formStatus={data.status}
             publishedresearch={data.publishedresearchprod}
+            coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.intellectualproperty && (
@@ -134,6 +155,8 @@ const AdminMonitoringFormDetails = () => {
             formStatus={data.status}
             intellectualproperty={data.intellectualproperty}
             points={data.points.points}
+            coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
 
@@ -143,6 +166,8 @@ const AdminMonitoringFormDetails = () => {
             formStatus={data.status}
             peerreview={data.peerreview}
             points={data.points.points}
+            coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
 
@@ -162,7 +187,8 @@ const AdminMonitoringFormDetails = () => {
             formStatus={data.status}
             points={data.points.points}
             documents={data.researchdocuments}
-            coauthors={data.coauthors}
+            coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
       </div>
@@ -171,3 +197,5 @@ const AdminMonitoringFormDetails = () => {
 };
 
 export default AdminMonitoringFormDetails;
+
+

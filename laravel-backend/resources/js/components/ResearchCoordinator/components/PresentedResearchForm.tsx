@@ -19,6 +19,9 @@ type PresentedResearchFormProps = {
   documents: Researchdocument[];
   formStatus: string;
   rejected_message: string | null;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  points?: number;
 };
 
 type statusType = {
@@ -30,6 +33,8 @@ const PresentedResearchForm = ({
   documents,
   formStatus,
   rejected_message,
+  coauthors,
+  externalAuthors,
 }: PresentedResearchFormProps) => {
 const [openApproveModal, setOpenApproveModal] = useState(false);
   const [openRejectModal, setOpenRejectModal] = useState(false);
@@ -117,6 +122,38 @@ const [openApproveModal, setOpenApproveModal] = useState(false);
             </div>
           </div>
         )}
+        <label htmlFor="presenters" className="text-sm">
+          Presenter(s)
+        </label>
+        <div className="flex flex-wrap gap-2 mt-1 mb-5">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <input
+              id="presenters"
+              value={presented.presenter_name}
+              disabled
+              className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
+            />
+          )}
+        </div>
         <label htmlFor="presentedResearch" className="text-sm">
           Presented Research
         </label>
@@ -275,3 +312,5 @@ const [openApproveModal, setOpenApproveModal] = useState(false);
 };
 
 export default PresentedResearchForm;
+
+

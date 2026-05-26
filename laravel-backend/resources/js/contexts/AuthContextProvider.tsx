@@ -12,6 +12,7 @@ type AuthContextType = {
   handleLogin: (navigate: NavigateFunction) => Promise<void>;
   email: string;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
+  isAuthenticated?: boolean;
   password: string;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
   loading: boolean;

@@ -20,8 +20,10 @@ import RejectedModalMessage from "./RejectedModalMessage";
 type PresentedResearchFormProps = {
   presented: Presentedresearchprod;
   documents: Researchdocument[];
-  formStatus: string;
   points: number;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  formStatus?: string;
 };
 
 const PresentedResearchForm = ({
@@ -29,6 +31,8 @@ const PresentedResearchForm = ({
   documents,
   formStatus,
   points,
+  coauthors,
+  externalAuthors,
 }: PresentedResearchFormProps) => {
   const [openModal, setOpenModal] = useState(false);
   const [openRejectedModal, setOpenRejectedModal] = useState(false);
@@ -67,6 +71,38 @@ const PresentedResearchForm = ({
   return (
     <>
       <div className="flex w-auto flex-col justify-center">
+        <label htmlFor="presenters" className="text-sm">
+          Presenter(s)
+        </label>
+        <div className="flex flex-wrap gap-2 mt-1 mb-5">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <input
+              id="presenters"
+              value={presented.presenter_name}
+              disabled
+              className="w-auto text-ellipsis border-b border-b-slate-600 py-1 ps-1 text-start text-sm capitalize"
+            />
+          )}
+        </div>
         <label htmlFor="presentedResearch" className="text-sm">
           Presented Research
         </label>
@@ -225,3 +261,5 @@ const PresentedResearchForm = ({
 };
 
 export default PresentedResearchForm;
+
+

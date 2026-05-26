@@ -16,10 +16,15 @@ type GenericResearchDetailsProps = {
     id: number;
     researchmonitoringform_id: number;
     dynamic_data: Record<string, any>;
-  };
+    formStatus?: string;
+  points?: number;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+};
   formSchema: Array<{ id: string; label: string; type: "text" | "date" | "number" }>;
   status: string;
   coauthors?: any[];
+  externalAuthors?: string[] | null;
   documents: Researchdocument[];
 };
 
@@ -29,6 +34,7 @@ function GenericResearchDetails({
   status,
   documents,
   coauthors,
+  externalAuthors,
 }: GenericResearchDetailsProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -94,15 +100,25 @@ function GenericResearchDetails({
         <div className="flex flex-col mb-4">
           <p className="mb-1 text-sm font-semibold">Author(s) / Collaborators</p>
           <div className="flex flex-wrap gap-2 mt-1">
-            {coauthors && coauthors.length > 0 ? (
-              coauthors.map((author) => (
-                <span
-                  key={author.id}
-                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
-                >
-                  {author.fname} {author.lname}
-                </span>
-              ))
+            {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+              <>
+                {coauthors?.map((author) => (
+                  <span
+                    key={author.id}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author.fname} {author.lname}
+                  </span>
+                ))}
+                {externalAuthors?.map((author, idx) => (
+                  <span
+                    key={`ext-${idx}`}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author}
+                  </span>
+                ))}
+              </>
             ) : (
               <span className="text-sm text-gray-500">No other co-authors added.</span>
             )}
@@ -233,3 +249,5 @@ function GenericResearchDetails({
 }
 
 export default GenericResearchDetails;
+
+

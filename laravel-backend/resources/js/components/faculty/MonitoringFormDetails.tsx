@@ -21,6 +21,17 @@ const MonitoringFormDetails = () => {
 
   const fullName = `${data?.users.fname} ${data?.users.mi ? data?.users.mi + ". " : ""}${data?.users.lname} ${data?.users.suffix ? data?.users.suffix : ""}`;
 
+  let parsedExternalAuthors: string[] = [];
+  if (typeof data?.external_authors === 'string') {
+    try {
+      parsedExternalAuthors = JSON.parse(data.external_authors);
+    } catch (e) {
+      parsedExternalAuthors = [];
+    }
+  } else if (Array.isArray(data?.external_authors)) {
+    parsedExternalAuthors = data.external_authors;
+  }
+
   if (loading)
     return <AiOutlineLoading3Quarters className="size-6 animate-spin" />;
 
@@ -108,6 +119,7 @@ const MonitoringFormDetails = () => {
             documents={data.researchdocuments}
             status={data.status}
             coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.presentedresearchprod && (
@@ -116,6 +128,7 @@ const MonitoringFormDetails = () => {
             presented={data.presentedresearchprod}
             documents={data.researchdocuments}
             coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
 
@@ -125,6 +138,7 @@ const MonitoringFormDetails = () => {
             documents={data.researchdocuments}
             completed={data.completedresearchprod}
             coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.citations && (
@@ -133,6 +147,7 @@ const MonitoringFormDetails = () => {
             citations={data.citations}
             documents={data.researchdocuments}
             coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.intellectualproperty && (
@@ -141,6 +156,7 @@ const MonitoringFormDetails = () => {
             status={data.status}
             intellectualproperty={data.intellectualproperty}
             coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.peerreview && (
@@ -149,6 +165,7 @@ const MonitoringFormDetails = () => {
             peerreview={data.peerreview}
             status={data.status}
             coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.publishedresearchprod && (
@@ -157,6 +174,7 @@ const MonitoringFormDetails = () => {
             status={data.status}
             published={data.publishedresearchprod}
             coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
         {data?.genericresearchprod && (
@@ -166,6 +184,7 @@ const MonitoringFormDetails = () => {
             generic={data.genericresearchprod}
             formSchema={data.researchinvolvement.form_schema || []}
             coauthors={data?.coauthors}
+            externalAuthors={parsedExternalAuthors}
           />
         )}
       </div>
@@ -174,3 +193,4 @@ const MonitoringFormDetails = () => {
 };
 
 export default MonitoringFormDetails;
+

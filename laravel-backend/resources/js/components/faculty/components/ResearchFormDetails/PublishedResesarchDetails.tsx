@@ -17,6 +17,7 @@ type PublishedResearchDetailsType = {
   documents: Researchdocument[];
   status: string;
   coauthors?: any[];
+  externalAuthors?: string[] | null;
 };
 
 function PublishedResearchDetails({
@@ -24,6 +25,7 @@ function PublishedResearchDetails({
   documents,
   status,
   coauthors,
+  externalAuthors,
 }: PublishedResearchDetailsType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -90,15 +92,25 @@ function PublishedResearchDetails({
         <div>
           <h2 className="font-semibold">Authors</h2>
           <div className="flex flex-wrap gap-2 mt-1 pl-5">
-            {coauthors && coauthors.length > 0 ? (
-              coauthors.map((author) => (
-                <span
-                  key={author.id}
-                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
-                >
-                  {author.fname} {author.lname}
-                </span>
-              ))
+            {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+              <>
+                {coauthors?.map((author) => (
+                  <span
+                    key={author.id}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author.fname} {author.lname}
+                  </span>
+                ))}
+                {externalAuthors?.map((author, idx) => (
+                  <span
+                    key={`ext-${idx}`}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author}
+                  </span>
+                ))}
+              </>
             ) : (
               <span className="text-sm tracking-wide capitalize underline">
                 {published.research.authors}
@@ -247,3 +259,4 @@ function PublishedResearchDetails({
 }
 
 export default PublishedResearchDetails;
+

@@ -7,7 +7,7 @@ import {
 import { imageMimeType } from "../../../util/ImageMimeTypes";
 import { pngwing as pdfThumbnail } from "../../../../assets/images";
 import Tooltip from "../../../shared/components/Tooltip";
-import { useNavigate } from "react-router-dom";
+
 import Badge from "../../../shared/components/Badge";
 import api from "../../../api/axios";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,9 +17,10 @@ type PeerReviewFormType = {
   documents: Researchdocument[];
   status: string;
   coauthors?: any[];
+  externalAuthors?: string[] | null;
 };
 
-function PeerReviewForm({ peerreview, documents, status, coauthors }: PeerReviewFormType) {
+function PeerReviewForm({ peerreview, documents, status, coauthors, externalAuthors }: PeerReviewFormType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -68,15 +69,25 @@ function PeerReviewForm({ peerreview, documents, status, coauthors }: PeerReview
         <div>
           <h2 className="font-semibold">Referee/Reviewer Name(s):</h2>
           <div className="flex flex-wrap gap-2 mt-1 pl-5">
-            {coauthors && coauthors.length > 0 ? (
-              coauthors.map((author) => (
-                <span
-                  key={author.id}
-                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
-                >
-                  {author.fname} {author.lname}
-                </span>
-              ))
+            {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+              <>
+                {coauthors?.map((author) => (
+                  <span
+                    key={author.id}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author.fname} {author.lname}
+                  </span>
+                ))}
+                {externalAuthors?.map((author, idx) => (
+                  <span
+                    key={`ext-${idx}`}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author}
+                  </span>
+                ))}
+              </>
             ) : (
               <span className="text-sm italic text-gray-500">
                 No reviewers linked.
@@ -255,3 +266,4 @@ function PeerReviewForm({ peerreview, documents, status, coauthors }: PeerReview
 }
 
 export default PeerReviewForm;
+

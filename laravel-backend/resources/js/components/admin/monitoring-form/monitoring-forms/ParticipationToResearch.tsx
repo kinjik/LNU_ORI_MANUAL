@@ -20,8 +20,10 @@ import RejectedModalMessage from "./RejectedModalMessage";
 type ParticipationToResearchProps = {
   participation: ResearchAttendance;
   documents: Researchdocument[];
-  formStatus: string;
   points: number;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  formStatus?: string;
 };
 
 const ParticipationToResearch = ({
@@ -29,6 +31,8 @@ const ParticipationToResearch = ({
   documents,
   formStatus,
   points,
+  coauthors,
+  externalAuthors,
 }: ParticipationToResearchProps) => {
   const [openModal, setOpenModal] = useState(false);
   const [openRejectedModal, setOpenRejectedModal] = useState(false);
@@ -76,6 +80,33 @@ const ParticipationToResearch = ({
           disabled
           className="w-auto text-ellipsis border-b border-b-slate-600 py-1 ps-1 text-start text-sm capitalize"
         />
+        <label htmlFor="participants" className="mt-5 text-sm">
+          Participant Name(s)
+        </label>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <span className="text-sm tracking-wide">No participants linked.</span>
+          )}
+        </div>
         <label htmlFor="date" className="mt-5 text-sm">
           Date
         </label>
@@ -233,3 +264,5 @@ const ParticipationToResearch = ({
 };
 
 export default ParticipationToResearch;
+
+

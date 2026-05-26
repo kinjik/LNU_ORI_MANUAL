@@ -19,6 +19,9 @@ type PeerReviewFormProps = {
   documents: Researchdocument[];
   formStatus: string;
   rejected_message: string | null;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  points?: number;
 };
 
 
@@ -27,6 +30,8 @@ const PeerReviewForm = ({
   documents,
   formStatus,
   rejected_message,
+  coauthors,
+  externalAuthors,
 }: PeerReviewFormProps) => {
   const [openApproveModal, setOpenApproveModal] = useState(false);
   const [openRejectModal, setOpenRejectModal] = useState(false);
@@ -121,6 +126,33 @@ const PeerReviewForm = ({
           disabled
           className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
         />
+        <label htmlFor="reviewers" className="mt-5 text-sm">
+          Referee/Reviewer Name(s)
+        </label>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <span className="text-sm tracking-wide">No reviewers linked.</span>
+          )}
+        </div>
 
         <label htmlFor="articleTitle" className="mt-5 text-sm">
           Article Title
@@ -314,3 +346,5 @@ const PeerReviewForm = ({
 };
 
 export default PeerReviewForm;
+
+

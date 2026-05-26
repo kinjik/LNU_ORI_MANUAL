@@ -36,7 +36,19 @@ class CompletedResearchProductionRequest extends FormRequest
             'completed.authorship_nature' => ['required_with:completed', 'string'],
             'completed.authors' => ['nullable', 'string'],
             'completed.author_ids' => ['required_with:completed', 'array'],
-            'completed.author_ids.*' => ['integer', 'exists:users,id'],
+            'completed.author_ids.*' => [
+                function ($attribute, $value, $fail) {
+                    if (is_numeric($value)) {
+                        if (!\Illuminate\Support\Facades\DB::table('users')->where('id', $value)->exists()) {
+                            $fail('The selected author is invalid.');
+                        }
+                    } elseif (!is_string($value)) {
+                        $fail('The author must be a valid user ID or a string name.');
+                    } elseif (strlen($value) > 255) {
+                        $fail('The custom author name must not exceed 255 characters.');
+                    }
+                }
+            ],
             'completed.research_field_id' => ['required_with:completed', 'integer'],
             'completed.research_type_id' => ['required_with:completed', 'integer'],
             'completed.socio_economic_objective_id' => ['nullable', 'integer'],
@@ -47,3 +59,4 @@ class CompletedResearchProductionRequest extends FormRequest
         ];
     }
 }
+

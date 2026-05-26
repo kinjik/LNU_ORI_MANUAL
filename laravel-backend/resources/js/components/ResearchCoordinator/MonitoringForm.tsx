@@ -21,6 +21,17 @@ const MonitoringForm = () => {
 
   const fullName = `${data?.users.fname} ${data?.users.mi ? data?.users.mi + ". " : ""}${data?.users.lname} ${data?.users.suffix ? data?.users.suffix : ""}`;
 
+  let parsedExternalAuthors: string[] = [];
+  if (typeof data?.external_authors === 'string') {
+    try {
+      parsedExternalAuthors = JSON.parse(data.external_authors);
+    } catch (e) {
+      parsedExternalAuthors = [];
+    }
+  } else if (Array.isArray(data?.external_authors)) {
+    parsedExternalAuthors = data.external_authors;
+  }
+
   if (loading)
     return (
       <div className="flex h-screen animate-bounce items-center justify-center font-semibold">
@@ -85,6 +96,8 @@ const MonitoringForm = () => {
                 formStatus={data.status}
                 documents={data.researchdocuments}
                 rejected_message={data.rejected_message ?? null}  
+                coauthors={data?.coauthors}
+                externalAuthors={parsedExternalAuthors}
               />
             )}
             {data?.completedresearchprod && (
@@ -93,6 +106,8 @@ const MonitoringForm = () => {
                 documents={data.researchdocuments}
                 formStatus={data.status}
                 rejected_message={data.rejected_message ?? null}
+                coauthors={data?.coauthors}
+                externalAuthors={parsedExternalAuthors}
               />
             )}
             {data?.attendancetoresearch && (
@@ -101,6 +116,8 @@ const MonitoringForm = () => {
                 documents={data.researchdocuments}
                 formStatus={data.status}
                 rejected_message={data.rejected_message ?? null}
+                coauthors={data?.coauthors}
+                externalAuthors={parsedExternalAuthors}
               />
             )}
             {data?.intellectualproperty && (
@@ -109,6 +126,8 @@ const MonitoringForm = () => {
                 documents={data.researchdocuments}
                 formStatus={data.status}
                 rejected_message={data.rejected_message ?? null}
+                coauthors={data?.coauthors}
+                externalAuthors={parsedExternalAuthors}
               />
             )}
             {data?.peerreview && (
@@ -117,6 +136,8 @@ const MonitoringForm = () => {
                 peerreview={data.peerreview}
                 formStatus={data.status}
                 rejected_message={data.rejected_message ?? null}
+                coauthors={data?.coauthors}
+                externalAuthors={parsedExternalAuthors}
               />
             )}
 
@@ -126,6 +147,8 @@ const MonitoringForm = () => {
                 formStatus={data.status}
                 published={data.publishedresearchprod}
                 rejected_message={data.rejected_message ?? null}
+                coauthors={data?.coauthors}
+                externalAuthors={parsedExternalAuthors}
               />
             )}
 
@@ -135,6 +158,8 @@ const MonitoringForm = () => {
                 citations={data.citations}
                 documents={data.researchdocuments}
                 rejected_message={data.rejected_message ?? null}
+                coauthors={data?.coauthors}
+                externalAuthors={parsedExternalAuthors}
               />
             )}
 
@@ -153,7 +178,8 @@ const MonitoringForm = () => {
                 documents={data.researchdocuments}
                 formStatus={data.status}
                 rejected_message={data.rejected_message ?? null}
-                coauthors={data.coauthors}
+                coauthors={data?.coauthors}
+                externalAuthors={parsedExternalAuthors}
               />
             )}
           </div>
@@ -164,3 +190,4 @@ const MonitoringForm = () => {
 };
 
 export default MonitoringForm;
+

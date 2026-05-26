@@ -52,3 +52,4 @@ const RejectedModalMessage = ({
 };
 
 export default RejectedModalMessage;
+

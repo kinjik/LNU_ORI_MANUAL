@@ -20,6 +20,9 @@ type PublishedResearchFormProps = {
   documents: Researchdocument[];
   formStatus: string;
   rejected_message: string | null;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  points?: number;
 };
 
 const PublishedResearchForm = ({
@@ -27,6 +30,8 @@ const PublishedResearchForm = ({
   documents,
   formStatus,
   rejected_message,
+  coauthors,
+  externalAuthors,
 }: PublishedResearchFormProps) => {
   const [openApproveModal, setOpenApproveModal] = useState(false);
   const [openRejectModal, setOpenRejectModal] = useState(false);
@@ -126,12 +131,35 @@ const PublishedResearchForm = ({
         >
           Authors
         </label>
-        <input
-          id="Activity/Seminar/Research Title"
-          value={published.research.authors}
-          disabled
-          className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm"
-        />
+        <div className="flex flex-wrap gap-2 mt-1">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <input
+              id="Activity/Seminar/Research Title"
+              value={published.research.authors}
+              disabled
+              className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm"
+            />
+          )}
+        </div>
         <label htmlFor="date" className="mt-5 text-sm">
           Published Date
         </label>
@@ -311,3 +339,5 @@ const PublishedResearchForm = ({
 };
 
 export default PublishedResearchForm;
+
+

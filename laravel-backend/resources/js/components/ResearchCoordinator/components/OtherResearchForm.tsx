@@ -18,6 +18,9 @@ type OtherResearchFormProps = {
   otherresearch: OtherResearchType;
   documents: Researchdocument[];
   formStatus: string;
+  points?: number;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
 };
 
 type statusType = {
@@ -203,3 +206,5 @@ const OtherResearchForm = ({
 };
 
 export default OtherResearchForm;
+
+

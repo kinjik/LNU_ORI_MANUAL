@@ -109,11 +109,21 @@ class CitationsController extends Controller
 
             Citation::create($citationsAttr);
 
-            $authorIds = $validated['citations']['author_ids'] ?? [];
-            if (!in_array(Auth::id(), $authorIds)) {
-                $authorIds[] = Auth::id();
+            $authorPayload = $validated['citations']['author_ids'] ?? [];
+            $registeredIds = [Auth::id()];
+            $externalAuthors = [];
+
+            foreach ($authorPayload as $author) {
+                if (is_numeric($author)) {
+                    $registeredIds[] = (int) $author;
+                } else {
+                    $externalAuthors[] = $author;
+                }
             }
-            $researchForm->coauthors()->sync($authorIds);
+
+            $registeredIds = array_unique($registeredIds);
+            $researchForm->coauthors()->sync($registeredIds);
+            $researchForm->update(['external_authors' => $externalAuthors]);
 
             $points = $validated['citations']['points'];
 

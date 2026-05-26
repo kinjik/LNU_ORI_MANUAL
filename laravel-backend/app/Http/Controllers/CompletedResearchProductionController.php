@@ -123,11 +123,21 @@ class CompletedResearchProductionController extends Controller
             ]);
 
             // Sync co-authors to the pivot table
-            // Always include the submitter; merge with any additional IDs sent from the form
-            $authorIds = $request->completed['author_ids'] ?? [];
-            // Cast to int array and ensure submitter is always present
-            $authorIds = array_unique(array_map('intval', [...$authorIds, Auth::id()]));
-            $researchForm->coauthors()->sync($authorIds);
+            $authorPayload = $request->completed['author_ids'] ?? [];
+            $registeredIds = [Auth::id()];
+            $externalAuthors = [];
+
+            foreach ($authorPayload as $author) {
+                if (is_numeric($author)) {
+                    $registeredIds[] = (int) $author;
+                } else {
+                    $externalAuthors[] = $author;
+                }
+            }
+
+            $registeredIds = array_unique($registeredIds);
+            $researchForm->coauthors()->sync($registeredIds);
+            $researchForm->update(['external_authors' => $externalAuthors]);
 
             $user = auth()->user();
 

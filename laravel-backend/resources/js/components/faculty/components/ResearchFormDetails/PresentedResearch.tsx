@@ -17,6 +17,9 @@ type PresentedResearchFormProps = {
   documents: Researchdocument[];
   status: string;
   coauthors?: any[];
+  externalAuthors?: string[] | null;
+  formStatus?: string;
+  points?: number;
 };
 
 function PresentedResearch({
@@ -24,6 +27,7 @@ function PresentedResearch({
   documents,
   status,
   coauthors,
+  externalAuthors,
 }: PresentedResearchFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -69,15 +73,25 @@ function PresentedResearch({
         <div>
           <h2 className="font-semibold">Presenter(s):</h2>
           <div className="flex flex-wrap gap-2 mt-1 pl-5">
-            {coauthors && coauthors.length > 0 ? (
-              coauthors.map((author) => (
-                <span
-                  key={author.id}
-                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
-                >
-                  {author.fname} {author.lname}
-                </span>
-              ))
+            {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+              <>
+                {coauthors?.map((author) => (
+                  <span
+                    key={author.id}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author.fname} {author.lname}
+                  </span>
+                ))}
+                {externalAuthors?.map((author, idx) => (
+                  <span
+                    key={`ext-${idx}`}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author}
+                  </span>
+                ))}
+              </>
             ) : (
               <span className="text-sm tracking-wide capitalize underline">
                 {presented.presenter_name}
@@ -225,3 +239,5 @@ function PresentedResearch({
 }
 
 export default PresentedResearch;
+
+

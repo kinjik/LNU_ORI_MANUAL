@@ -21,6 +21,9 @@ type CompletedResearchFormProps = {
   documents: Researchdocument[];
   formStatus: string;
   rejected_message: string | null;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  points?: number;
 };
 
 const CompletedResearchForm = ({
@@ -28,6 +31,8 @@ const CompletedResearchForm = ({
   documents,
   formStatus,
   rejected_message,
+  coauthors,
+  externalAuthors,
 }: CompletedResearchFormProps) => {
   const status = useRef<string[]>([]);
   const [openModal, setOpenModal] = useState(false);
@@ -143,9 +148,32 @@ const CompletedResearchForm = ({
           className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
         />
         <p className="mb-1 mt-5 text-sm">Author(s)</p>
-        <span className="text-sm tracking-wide">
-          {completed.research.authors}
-        </span>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <span className="text-sm tracking-wide">
+              {completed.research.authors}
+            </span>
+          )}
+        </div>
 
         <h2 className="text-1xl mb-5 mt-5 font-semibold">
           Supporting Document(s)
@@ -254,3 +282,5 @@ const CompletedResearchForm = ({
 };
 
 export default CompletedResearchForm;
+
+

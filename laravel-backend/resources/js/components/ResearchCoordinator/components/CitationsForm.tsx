@@ -18,9 +18,12 @@ type CitationsFormProps = {
   documents: Researchdocument[];
   formStatus: string;
   rejected_message: string | null;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  points?: number;
 };
 
-const CitationsForm = ({ citations, documents, formStatus, rejected_message }: CitationsFormProps) => {
+const CitationsForm = ({ citations, documents, formStatus, rejected_message, coauthors, externalAuthors }: CitationsFormProps) => {
   const [openApproveModal, setOpenApproveModal] = useState(false);
   const [openRejectModal, setOpenRejectModal] = useState(false);
   const [rejectMessage, setRejectMessage] = useState("");
@@ -115,12 +118,35 @@ const CitationsForm = ({ citations, documents, formStatus, rejected_message }: C
         <label htmlFor="authors" className="mt-5 text-sm">
           Authors
         </label>
-        <input
-          id="authors"
-          value={citations.authors}
-          disabled
-          className="w-full text-ellipsis overflow-hidden whitespace-nowrap border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
-        />
+        <div className="flex flex-wrap gap-2 mt-1">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <input
+              id="authors"
+              value={citations.authors}
+              disabled
+              className="w-full text-ellipsis overflow-hidden whitespace-nowrap border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
+            />
+          )}
+        </div>
 
         <label htmlFor="datePublished" className="mt-5 text-sm">
           Date Publication
@@ -328,3 +354,4 @@ const CitationsForm = ({ citations, documents, formStatus, rejected_message }: C
 };
 
 export default CitationsForm;
+

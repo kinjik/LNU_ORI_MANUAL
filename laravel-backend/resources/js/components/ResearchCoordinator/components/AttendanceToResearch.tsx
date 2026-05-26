@@ -19,6 +19,9 @@ type AttendanceToResearchProps = {
   documents: Researchdocument[];
   formStatus: string;
   rejected_message: string | null;
+  points?: number;
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
 };
 
 type statusType = {
@@ -279,3 +282,5 @@ const AttendanceToResearch = ({
 };
 
 export default AttendanceToResearch;
+
+

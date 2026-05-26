@@ -104,11 +104,21 @@ class IntellectualPropertyController extends Controller
 
         IntellectualProperty::create($intellectualAttr);
 
-        $authorIds = $validated['intellectual']['author_ids'] ?? [];
-        if (!in_array(Auth::id(), $authorIds)) {
-            $authorIds[] = Auth::id();
+        $authorPayload = $validated['intellectual']['author_ids'] ?? [];
+        $registeredIds = [Auth::id()];
+        $externalAuthors = [];
+
+        foreach ($authorPayload as $author) {
+            if (is_numeric($author)) {
+                $registeredIds[] = (int) $author;
+            } else {
+                $externalAuthors[] = $author;
+            }
         }
-        $researchForm->coauthors()->sync($authorIds);
+
+        $registeredIds = array_unique($registeredIds);
+        $researchForm->coauthors()->sync($registeredIds);
+        $researchForm->update(['external_authors' => $externalAuthors]);
 
         $rating = $this->rating($points);
 

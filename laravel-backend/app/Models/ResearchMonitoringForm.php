@@ -27,13 +27,15 @@ class ResearchMonitoringForm extends Model
          'reviewed_at',
          'evaluated_at',
          'is_archived',
-         'rejected_message'
+         'rejected_message',
+         'external_authors'
     ];
 
     protected function casts(): array
     {
         return [
-            'status' => ResearchMonitoringFormStatus::class
+            'status' => ResearchMonitoringFormStatus::class,
+            'external_authors' => 'array'
         ];
     }
 

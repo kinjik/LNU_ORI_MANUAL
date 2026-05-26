@@ -89,6 +89,7 @@ export type MonitoringFormDetailsType = {
   researchdocuments: Researchdocument[];
   points: Points;
   coauthors?: any[];
+  external_authors?: string | string[] | null;
 };
 
 export type OtherResearchType = {
@@ -184,6 +185,13 @@ export type Research = {
   socio_economic_objective_id: number | null;
   research_field_id: number | null;
   research_type_id: number | null;
+  created_at?: Date | string;
+  file_path?: string | null;
+  completed?: any;
+  published?: any;
+  research_field?: { id: number; field: string } | null;
+  research_type?: { id: number; type: string } | null;
+  socio_economic_objective?: { id: number; objective: string } | null;
 };
 
 export const STATUS_TYPE = {

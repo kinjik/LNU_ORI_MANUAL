@@ -110,11 +110,21 @@ class ResearchAttendanceController extends Controller
                         'attendance_nature' => $validated['participation']['attendance_nature']
                     ]);
 
-                    $authorIds = $validated['participation']['author_ids'] ?? [];
-                    if (!in_array(Auth::id(), $authorIds)) {
-                        $authorIds[] = Auth::id();
+                    $authorPayload = $validated['participation']['author_ids'] ?? [];
+                    $registeredIds = [Auth::id()];
+                    $externalAuthors = [];
+
+                    foreach ($authorPayload as $author) {
+                        if (is_numeric($author)) {
+                            $registeredIds[] = (int) $author;
+                        } else {
+                            $externalAuthors[] = $author;
+                        }
                     }
-                    $participation->researchmonitoringform->coauthors()->sync($authorIds);
+
+                    $registeredIds = array_unique($registeredIds);
+                    $participation->researchmonitoringform->coauthors()->sync($registeredIds);
+                    $participation->researchmonitoringform->update(['external_authors' => $externalAuthors]);
 
                     $docs = $participation->researchmonitoringform->researchdocuments;
 
@@ -200,11 +210,21 @@ class ResearchAttendanceController extends Controller
 
             ResearchAttendance::create($participationAttr);
 
-            $authorIds = $validated['participation']['author_ids'] ?? [];
-            if (!in_array(Auth::id(), $authorIds)) {
-                $authorIds[] = Auth::id();
+            $authorPayload = $validated['participation']['author_ids'] ?? [];
+            $registeredIds = [Auth::id()];
+            $externalAuthors = [];
+
+            foreach ($authorPayload as $author) {
+                if (is_numeric($author)) {
+                    $registeredIds[] = (int) $author;
+                } else {
+                    $externalAuthors[] = $author;
+                }
             }
-            $researchForm->coauthors()->sync($authorIds);
+
+            $registeredIds = array_unique($registeredIds);
+            $researchForm->coauthors()->sync($registeredIds);
+            $researchForm->update(['external_authors' => $externalAuthors]);
 
             $rating = $this->rating($points);
 

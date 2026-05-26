@@ -21,8 +21,10 @@ import Badge from "../../../shared/components/Badge";
 type CompletedResearchFormProps = {
   completedresearchprod: Completedresearchprod;
   formStatus: string;
-  points: number;
   documents: Researchdocument[];
+  coauthors?: any[];
+  externalAuthors?: string[] | null;
+  points?: number;
 };
 
 const CompletedResearchForm = ({
@@ -30,6 +32,8 @@ const CompletedResearchForm = ({
   formStatus,
   points,
   documents,
+  coauthors,
+  externalAuthors,
 }: CompletedResearchFormProps) => {
   const [openModal, setOpenModal] = useState(false);
   const [openRejectedModal, setOpenRejectedModal] = useState(false);
@@ -50,7 +54,7 @@ const CompletedResearchForm = ({
       status: status.current,
       rejected_message: "",
       isAdmin: true,
-      adminParams: { points: editPoints, rejected_message: rejectedMessage },
+      adminParams: { points: editPoints ?? 0, rejected_message: rejectedMessage },
     };
 
     await updateForm(updateVariables);
@@ -82,12 +86,35 @@ const CompletedResearchForm = ({
         >
           Authors
         </label>
-        <input
-          id="Activity/Seminar/Research Title"
-          value={completedresearchprod.research.authors}
-          disabled
-          className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
-        />
+        <div className="flex flex-wrap gap-2 mt-1">
+          {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+            <>
+              {coauthors?.map((author) => (
+                <span
+                  key={author.id}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author.fname} {author.lname}
+                </span>
+              ))}
+              {externalAuthors?.map((author, idx) => (
+                <span
+                  key={`ext-${idx}`}
+                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                >
+                  {author}
+                </span>
+              ))}
+            </>
+          ) : (
+            <input
+              id="Activity/Seminar/Research Title"
+              value={completedresearchprod.research.authors}
+              disabled
+              className="w-auto text-ellipsis border-b border-b-slate-600 bg-white py-1 ps-1 text-start text-sm capitalize"
+            />
+          )}
+        </div>
         <label htmlFor="date" className="mt-5 text-sm">
           Date Completed
         </label>
@@ -227,3 +254,5 @@ const CompletedResearchForm = ({
 };
 
 export default CompletedResearchForm;
+
+

@@ -13,9 +13,10 @@ type CitationsDetailsType = {
   status: string;
   documents: Researchdocument[];
   coauthors?: any[];
+  externalAuthors?: string[] | null;
 };
 
-function CitationsDetails({ citations, status, documents, coauthors }: CitationsDetailsType) {
+function CitationsDetails({ citations, status, documents, coauthors, externalAuthors }: CitationsDetailsType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -81,15 +82,25 @@ function CitationsDetails({ citations, status, documents, coauthors }: Citations
         <div>
           <h2 className="font-semibold">Authors</h2>
           <div className="flex flex-wrap gap-2 mt-1 pl-5">
-            {coauthors && coauthors.length > 0 ? (
-              coauthors.map((author) => (
-                <span
-                  key={author.id}
-                  className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
-                >
-                  {author.fname} {author.lname}
-                </span>
-              ))
+            {(coauthors?.length || 0) > 0 || (externalAuthors?.length || 0) > 0 ? (
+              <>
+                {coauthors?.map((author) => (
+                  <span
+                    key={author.id}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author.fname} {author.lname}
+                  </span>
+                ))}
+                {externalAuthors?.map((author, idx) => (
+                  <span
+                    key={`ext-${idx}`}
+                    className="flex items-center gap-1 rounded-full border border-blue-600 bg-white px-3 py-1 text-sm font-medium text-blue-600 capitalize"
+                  >
+                    {author}
+                  </span>
+                ))}
+              </>
             ) : (
               <span className="text-sm tracking-wide capitalize underline">
                 {citations.authors}
@@ -229,3 +240,4 @@ function CitationsDetails({ citations, status, documents, coauthors }: Citations
 }
 
 export default CitationsDetails;
+

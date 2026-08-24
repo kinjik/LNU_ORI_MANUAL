@@ -34,8 +34,9 @@ class OtherResearchInvolvementRequest extends FormRequest
             
             'otherresearch.research_involvement' => ['required', 'string', 'max:255'],
             'otherresearch.research_title' => ['nullable', 'string', 'max:255'],
+            'otherresearch.fund_source_nature' => ['required', 'string', 'max:255'],
             'otherresearch.date'=> ['required'],
-            'otherresearch.points' => ['integer','required'],
+            'otherresearch.points' => ['numeric','required'],
         ];
     }
 }

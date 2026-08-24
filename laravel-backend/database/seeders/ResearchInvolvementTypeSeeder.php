@@ -36,7 +36,7 @@ class ResearchInvolvementTypeSeeder extends Seeder
             ['research_involvement_type' => 'refereeing in peer-reviewed journal',  'enable' => true],
 
             //8
-            ['research_involvement_type' => 'other research involvement (panel/statistician/editor/adviser/internal/external funded research)',  'enable' => false],
+            ['research_involvement_type' => 'other research involvement (panel/statistician/editor/adviser/internal/external funded research)',  'enable' => true],
 
             //9
             ['research_involvement_type' => 'creative works',  'enable' => false],

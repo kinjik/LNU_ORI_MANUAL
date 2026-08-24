@@ -195,14 +195,24 @@ class OtherResearchInvolvementController extends Controller
     // }
     public function getPoints(Request $request)
     {
-        if($request->funded_research) {
-            $involvementCompletedStudent = CompletedStudentThesesInvolvementPoint::where('research_involvement', $request->research_involvement)->first()->$request->school_level;
+        $points = 0;
+
+        if (!$request->funded_research && $request->school_level) {
+            // Student theses
+            $record = CompletedStudentThesesInvolvementPoint::where('research_involvement', $request->research_involvement)->first();
+            if ($record) {
+                $level = $request->school_level;
+                $points = $record->$level ?? 0;
+            }
+        } else {
+            // Internal/External funded research
+            $record = InternalExternalResearchPoint::where('research_involvement', $request->research_involvement)->first();
+            if ($record) {
+                $points = $record->points ?? 0;
+            }
         }
 
-        $points = InternalExternalResearchPoint::where('research_involvement', $request->research_involvement)->first();
-
-        return $this->success(['internal_external' => $points, 'student_theses_points' => $involvementCompletedStudent ?? 0], 'Data Retrieved Succesfully');
-
+        return $this->success(['points' => (float) $points], 'Data Retrieved Succesfully');
     }
     /**
      * Display the specified resource.

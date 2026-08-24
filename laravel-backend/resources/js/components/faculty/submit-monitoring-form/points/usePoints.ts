@@ -83,13 +83,13 @@ type PointsType = {
 };
 
 const fetchOtherResearchPoints = async (props: PointsType) => {
-  const res = await api.post("/api/other-research-involvement/points", props);
+  const res = await api.post("/api/otherresearch/points", props);
   return res.data.data.points;
 };
 
 export const useGetOtherResearchPoints = (props: PointsType) => {
   const isPropsValid =
-    !!props.school_level && props.research_involvement !== undefined;
+    props.research_involvement !== undefined && props.research_involvement !== "";
 
   const query = useQuery({
     queryKey: ["otherResearchPoints", props],

@@ -17,6 +17,7 @@ import Citations from "./citations/Citations";
 import ParticipationResearch from "./participation-research/ParticipationResearch";
 import IntellectualProperty from "./intellectual-property/IntellectualProperty";
 import PeerReview from "./peer-review/PeerReview";
+import OtherResearch from "./other-research/OtherResearch";
 import GenericResearch from "./generic-research/GenericResearch";
 
 type ResearchInvolvementDetailsProps = {
@@ -59,6 +60,7 @@ const ResearchInvolvementDetails = ({
     5: ParticipationResearch,
     6: IntellectualProperty,
     7: PeerReview,
+    8: OtherResearch,
   };
 
   const SelectedComponent = researchComponents[involvementType];
